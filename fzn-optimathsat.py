@@ -6,6 +6,7 @@ import fileinput
 import os
 import subprocess
 import sys
+from shutil import which
 
 ###
 ### MAIN
@@ -145,6 +146,9 @@ def mangle_smt2_basic(smt2_file, other_args):
 
 def optimathsat(known_args, other_args):
     args = get_cmdline_args(known_args, other_args)
+
+    if which("optimathsat") is None:
+        sys.exit("error: the binary of `optimathsat' has not been found in the path.")
 
     result = subprocess.run(args, capture_output=True, text=True)
 
