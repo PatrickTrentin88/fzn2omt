@@ -248,7 +248,7 @@ the model in a `DZN`-friendly format.
 
 - multi-objective optimization:
 
-      ~$ fzn2optimathsat.py flatzinc_multiobjective.fzn -opt.priority=box
+      ~$ fzn2optimathsat.py examples/flatzinc_multiobjective.fzn -opt.priority=box
       % objective: x (optimal model)
       x = 3;
       y = 0;
@@ -259,14 +259,14 @@ the model in a `DZN`-friendly format.
       ----------
       =========
 
-      ~$ fzn2optimathsat.py flatzinc_multiobjective.fzn -opt.priority=lex
+      ~$ fzn2optimathsat.py examples/flatzinc_multiobjective.fzn -opt.priority=lex
       % lexicographic search (optimal model)
       x = 3;
       y = 1;
       ----------
       =========
 
-      ~$ fzn2optimathsat.py flatzinc_multiobjective.fzn -opt.priority=par
+      ~$ fzn2optimathsat.py examples/flatzinc_multiobjective.fzn -opt.priority=par
       % pareto search (optimal model)
       x = 3;
       y = 1;
