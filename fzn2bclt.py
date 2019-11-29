@@ -27,7 +27,7 @@ def main():
 
 def get_cmdline_options():
     """parses and returns input parameters."""
-    parser = argparse.ArgumentParser(description="A tool for solving FlatZinc problems with `bclt'.")
+    parser = argparse.ArgumentParser(description="A tool for solving FlatZinc problems with bclt.")
 
     main_group = parser.add_argument_group("Main Options")
 

@@ -27,7 +27,7 @@ def main():
 
 def get_cmdline_options():
     """parses and returns input parameters."""
-    parser = argparse.ArgumentParser(description="A FlatZinc compiler to SMT-LIBv2 with OMT extensions.")
+    parser = argparse.ArgumentParser(description="A tool for solving FlatZinc problems with z3.")
 
     main_group = parser.add_argument_group("Main Options")
 
