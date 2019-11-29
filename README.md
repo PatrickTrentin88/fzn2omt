@@ -300,7 +300,8 @@ the model in a `DZN`-friendly format.
 minimization objectives, so the actual goal of a maximization
 problem is replaced with the minimization of the opposite
 target. When this happens, the value printed in the first line
-of the output is the opposite of the actual optimal value.
+of the output is not the optimal value of the original objective
+function.
 
 ## Example #03: Solving with [z3](https://github.com/Z3Prover/z3)
 
@@ -324,7 +325,13 @@ of the output is the opposite of the actual optimal value.
       (define-fun X_INTRODUCED_15_ () Int
         30)
     )
-
+    
+**Note:** when using the **SMT-LIB** encoding based on the `QF_BV`
+Logic, [z3](https://github.com/Z3Prover/z3) can handle only maximization
+targets. Therefore, the actual minimization goal is replaced with a
+custom maximization objective that forces the minimization of the
+original goal. When this happens, the value printed in the first lines
+of the output is not the optimal value of the original objective function.
 
 # NOTES
 
