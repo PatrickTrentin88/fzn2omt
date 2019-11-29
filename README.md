@@ -169,7 +169,7 @@ The option to set the desired multi-objective optimization is:
     
 **e.g.**
 
-     ~$ fzn2optimathsat.py examples/multiobj.fzn -opt.priority=par
+     ~$ fzn2optimathsat.py <model.fzn> -opt.priority=par
      ...
 
 ## fzn2z3.py
@@ -200,7 +200,7 @@ The option to set the desired multi-objective optimization is:
     
 **e.g.**
 
-     ~$ fzn2z3.py examples/multiobj.fzn opt.priority=par
+     ~$ fzn2z3.py <model.fzn> opt.priority=par
      ...
 
 
