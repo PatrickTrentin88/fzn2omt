@@ -231,7 +231,7 @@ the model in a `DZN`-friendly format.
 
 - all possible solutions:
 
-      ~$ fzn2optimathsat.py examples/flatzinc_allsolutions.fzn -opt.fzn.all_solutions=True
+      ~$ fzn2optimathsat.py examples/flatzinc_allsolutions.fzn --all-solutions
       % allsat model
       x = 3;
       y = 0;
