@@ -200,7 +200,7 @@ The option to set the desired multi-objective optimization is:
     
 **e.g.**
 
-     ~$ fzn2z3.py examples/multiobj.fzn -opt.priority=par
+     ~$ fzn2z3.py examples/multiobj.fzn opt.priority=par
      ...
 
 
