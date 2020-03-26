@@ -64,8 +64,13 @@ def get_cmdline_options():
                         action="store_true", default=False)
 
     # opt.fzn.max_solutions (0)
-    parser.add_argument("--max-solutions", help="Maximum number of solutions printed.",
+    parser.add_argument("--max-solutions", "-n", help="Maximum number of solutions printed.",
                         metavar="N", type=int, default=0)
+
+    # MiniZinc style all solutions
+    # If enabled, it overrides --partial-solutions and --all-solutions
+    parser.add_argument("--all-solutions-mzn", "-a", help="Print all solutions of the input problem. If this is an optimization problem, it prints sub-optimal solutions satisfying the input model.",
+                        action="store_true", default=False)
 
     # parse
     known_args, other_args = parser.parse_known_args()
@@ -115,9 +120,18 @@ def get_cmdline_args(known_args, other_args):
 
     args.append("-opt.fzn.asoft_encoding={}".format(known_args.cardinality_networks))
     args.append("-opt.fzn.bv_all_different={}".format(known_args.bv_alldifferent))
-    args.append("-opt.fzn.partial_solutions={}".format(known_args.partial_solutions))
-    args.append("-opt.fzn.all_solutions={}".format(known_args.all_solutions))
     args.append("-opt.fzn.max_solutions={}".format(known_args.max_solutions))
+
+    if (known_args.all_solutions_mzn):
+        if is_optimization_problem(known_args.model):
+            args.append("-opt.fzn.all_solutions=False")
+            args.append("-opt.fzn.partial_solutions=True")
+        else:
+            args.append("-opt.fzn.all_solutions=True")
+            args.append("-opt.fzn.partial_solutions=False")
+    else:
+        args.append("-opt.fzn.partial_solutions={}".format(known_args.partial_solutions))
+        args.append("-opt.fzn.all_solutions={}".format(known_args.all_solutions))
 
     args.extend(other_args)
     return args
