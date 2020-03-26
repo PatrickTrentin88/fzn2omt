@@ -47,10 +47,10 @@ compiler for
 
 The scripts require `Python 3.5` or superior.
 
-To install the scripts, add the `mzn2omt_tools` directory
+To install the scripts, add the current directory
 to the `PATH` environment variable:
 
-    export PATH=$PATH:.../mzn2omt_tools/
+    export PATH=$PATH:.../fzn2omt
 
 It is also necessary to add the binaries of
 [Barcelogic](https://barcelogic.com/),
