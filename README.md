@@ -138,7 +138,8 @@ to the underlying OMT solver.
     usage: fzn2optimathsat.py [-h] [--smt2 <file>.smt2] [--compile-only]
                               [--bv-enc | --int-enc] [--cardinality-networks]
                               [--bv-alldifferent] [--partial-solutions]
-                              [--all-solutions] [--max-solutions N]
+                              [--all-solutions-opt] [--max-solutions N]
+                              [--all-solutions]
                               <model>.fzn
     
     A simple wrapper around OptiMathSAT.
@@ -158,10 +159,15 @@ to the underlying OMT solver.
       --bv-alldifferent     all-different constraints encoded with Bit-Vectors.
       --partial-solutions   Print any sub-optimal solution satisfying the input
                             model.
-      --all-solutions       Print all solutions of the input problem. If this is
+      --all-solutions-opt   Print all solutions of the input problem. If this is
                             an optimization problem, it prints all solutions with
                             the same optimal value.
-      --max-solutions N     Maximum number of solutions printed.
+      --max-solutions N, -n N
+                            Maximum number of solutions printed.
+      --all-solutions, -a   Print all solutions of the input problem. With
+                            satisfaction problems, it enables '--all-solutions-
+                            opt'. With optimization problems, it enables '--
+                            partial-solutions'.
 
 The option to set the desired multi-objective optimization is:
 
@@ -229,9 +235,9 @@ the model in a `DZN`-friendly format.
       ----------
       =========
 
-- all possible solutions:
+- all solutions with the same optimal value:
 
-      ~$ fzn2optimathsat.py examples/flatzinc_allsolutions.fzn --all-solutions
+      ~$ fzn2optimathsat.py examples/flatzinc_allsolutions.fzn --all-solutions-opt
       % allsat model
       x = 3;
       y = 0;
@@ -245,6 +251,29 @@ the model in a `DZN`-friendly format.
       r2 = false;
       ----------
       =========
+
+- all partial solutions encountered along the optimization search:
+
+    ~$ fzn2optimathsat.py examples/flatzinc_allsolutions.fzn --partial-solutions
+    % objective: x (model)
+    x = 2;
+    y = 0;
+    r1 = true;
+    r2 = true;
+    ----------
+    % objective: x (model)
+    x = 3;
+    y = 0;
+    r1 = true;
+    r2 = false;
+    ----------
+    % objective: x (optimal model)
+    x = 3;
+    y = 0;
+    r1 = true;
+    r2 = false;
+    ----------
+    =========
 
 - multi-objective optimization:
 
