@@ -56,11 +56,14 @@ def get_cmdline_options():
                         action="store_true", default=False)
 
     # opt.fzn.partial_solutions (false)
-    parser.add_argument("--partial-solutions", help="Print any sub-optimal solution satisfying the input model.",
+    parser.add_argument("--partial-solutions", help=("Print any sub-optimal solution satisfying "
+                        "the input model."),
                         action="store_true", default=False)
 
     # opt.fzn.all_solutions (false)
-    parser.add_argument("--all-solutions", help="Print all solutions of the input problem. If this is an optimization problem, it prints all solutions with the same optimal value.",
+    parser.add_argument("--all-solutions-opt", help=("Print all solutions of the input problem. "
+                        "If this is an optimization problem, it prints all solutions with the same "
+                        "optimal value."),
                         action="store_true", default=False)
 
     # opt.fzn.max_solutions (0)
@@ -68,8 +71,9 @@ def get_cmdline_options():
                         metavar="N", type=int, default=0)
 
     # MiniZinc style all solutions
-    # If enabled, it overrides --partial-solutions and --all-solutions
-    parser.add_argument("--all-solutions-mzn", "-a", help="Print all solutions of the input problem.",
+    parser.add_argument("--all-solutions", "-a", help=("Print all solutions of the input problem. "
+                        "With satisfaction problems, it enables '--all-solutions-opt'. "
+                        "With optimization problems, it enables '--partial-solutions'."),
                         action="store_true", default=False)
 
     # parse
@@ -122,16 +126,14 @@ def get_cmdline_args(known_args, other_args):
     args.append("-opt.fzn.bv_all_different={}".format(known_args.bv_alldifferent))
     args.append("-opt.fzn.max_solutions={}".format(known_args.max_solutions))
 
-    if (known_args.all_solutions_mzn):
+    if (known_args.all_solutions):
         if is_optimization_problem(known_args.model):
-            args.append("-opt.fzn.all_solutions=False")
-            args.append("-opt.fzn.partial_solutions=True")
+            known_args.partial_solutions=True
         else:
-            args.append("-opt.fzn.all_solutions=True")
-            args.append("-opt.fzn.partial_solutions=False")
-    else:
-        args.append("-opt.fzn.partial_solutions={}".format(known_args.partial_solutions))
-        args.append("-opt.fzn.all_solutions={}".format(known_args.all_solutions))
+            known_args.all_solutions_opt=True
+
+    args.append("-opt.fzn.all_solutions={}".format(known_args.all_solutions_opt))
+    args.append("-opt.fzn.partial_solutions={}".format(known_args.partial_solutions))
 
     args.extend(other_args)
     return args
