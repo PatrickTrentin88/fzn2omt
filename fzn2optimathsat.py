@@ -69,7 +69,7 @@ def get_cmdline_options():
 
     # MiniZinc style all solutions
     # If enabled, it overrides --partial-solutions and --all-solutions
-    parser.add_argument("--all-solutions-mzn", "-a", help="Print all solutions of the input problem. If this is an optimization problem, it prints sub-optimal solutions satisfying the input model.",
+    parser.add_argument("--all-solutions-mzn", "-a", help="Print all solutions of the input problem.",
                         action="store_true", default=False)
 
     # parse
