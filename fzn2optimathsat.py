@@ -349,16 +349,15 @@ def optimathsat(known_args, other_args):
     if which("optimathsat") is None:
         sys.exit("error: the binary of `optimathsat' has not been found in the path.")
 
-    result = subprocess.run(args, capture_output=True, text=True)
+    if known_args.compile_only:
+        result = subprocess.run(args, capture_output=True, text=True)
 
-    # print stdout
-    if not known_args.compile_only:
-        if len(result.stdout) > 0:
-            print(result.stdout, end='')
+        # print stderr
+        if len(result.stderr) > 0:
+            print(result.stderr, end='')
 
-    # print stderr
-    if len(result.stderr) > 0:
-        print(result.stderr, end='')
+    else:
+        subprocess.run(args, text=True)
 
     # apply minor changes to SMT-LIB file
     if known_args.smt2:
@@ -371,6 +370,7 @@ def optimathsat(known_args, other_args):
             mangle_smt2_for_z3(known_args, other_args, is_opt)
         else:
             sys.exit("error: unsupported solver '{}'.".format(known_args.solver))
+
 
 
 ###

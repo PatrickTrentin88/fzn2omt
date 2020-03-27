@@ -97,13 +97,8 @@ def run_z3(known_args, other_args):
 
     args = get_cmdline_args(known_args, other_args)
 
-    result = subprocess.run(args, capture_output=True, text=True)
+    subprocess.run(args, text=True)
 
-    if len(result.stdout) > 0:
-        print(result.stdout, end='')
-
-    if len(result.stderr) > 0:
-        print(result.stderr, end='')
 
 
 ###
