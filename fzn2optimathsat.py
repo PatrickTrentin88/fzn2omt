@@ -33,11 +33,16 @@ def get_cmdline_options():
                         help="The FlatZinc model", action=check_file_ext('fzn'))
 
     parser.add_argument("--smt2", "--output-smt2-to-file", metavar="<file>.smt2",
-                        type=argparse.FileType('w'), help="Filename for the generated SMT-LIB output",
-                        default=None, action=check_file_ext('smt2'))
+                        type=argparse.FileType('w'), action=check_file_ext('smt2'),
+                        help="Filename for the generated SMT-LIB output",
+                        default=None)
 
     parser.add_argument("--compile-only", help="Compile only (do not run solver).",
                         action="store_true", default=False)
+
+    ####################
+    # ENCODING OPTIONS #
+    ####################
 
     # opt.fzn.bv_integers (false)
     group = parser.add_mutually_exclusive_group()
@@ -47,45 +52,82 @@ def get_cmdline_options():
                         action="store_true", default=True)
 
     # opt.fzn.asoft_encoding (true)
-    parser.add_argument("--cardinality-networks", help="Enable cardinality networks (when applicable).",
+    parser.add_argument("--cardinality-networks",
+                        help="Enable cardinality networks (when applicable).",
                         action="store_true", default=False)
 
 
     # opt.fzn.bv_all_different (true)
-    parser.add_argument("--bv-alldifferent", help="all-different constraints encoded with Bit-Vectors.",
+    parser.add_argument("--bv-alldifferent",
+                        help="all-different constraints encoded with Bit-Vectors.",
                         action="store_true", default=False)
+
+    ##################
+    # SEARCH OPTIONS #
+    ##################
+
+    # Random Seed
+    parser.add_argument("--random-seed", "-r",
+                        help=("Set seed for pseudo-random number generators."),
+                        metavar="N", type=int, default=None)
+
+    # non-linear
+    parser.add_argument("--experimental-non-linear", "-e",
+                        help=("Activates experimental non-linear support. "
+                        "Enabling this option can negatively impact the "
+                        "performance."), action="store_true", default=False)
 
     # opt.fzn.partial_solutions (false)
-    parser.add_argument("--partial-solutions", help=("Print any sub-optimal solution satisfying "
-                        "the input model."),
-                        action="store_true", default=False)
+    parser.add_argument("--partial-solutions",
+                        help=("Print any sub-optimal solution satisfying "
+                        "the input model."), action="store_true", default=False)
 
     # opt.fzn.all_solutions (false)
-    parser.add_argument("--all-solutions-opt", help=("Print all solutions of the input problem. "
-                        "If this is an optimization problem, it prints all solutions with the same "
-                        "optimal value."),
+    parser.add_argument("--all-solutions-opt",
+                        help=("Print all solutions of the input problem. "
+                        "If this is an optimization problem, it prints all "
+                        "solutions with the same optimal value."),
                         action="store_true", default=False)
 
-    # opt.fzn.max_solutions (0)
-    parser.add_argument("--max-solutions", "-n", help="Maximum number of solutions printed.",
-                        metavar="N", type=int, default=0)
-
     # MiniZinc style all solutions
-    parser.add_argument("--all-solutions", "-a", help=("Print all solutions of the input problem. "
+    parser.add_argument("--all-solutions", "-a",
+                        help=("Print all solutions of the input problem. "
                         "With satisfaction problems, it enables '--all-solutions-opt'. "
                         "With optimization problems, it enables '--partial-solutions'."),
                         action="store_true", default=False)
 
+    # opt.fzn.max_solutions (0)
+    parser.add_argument("--max-solutions", "-n",
+                        help="Maximum number of solutions printed.",
+                        metavar="N", type=int, default=0)
 
-    # Random Seed
-    parser.add_argument("--random-seed", "-r", help=("Set seed for pseudo-random number generators."),
-                        metavar="N", type=int, default=None)
+    ##################
+    # MODEL PRINTING #
+    ##################
+
+    # opt.fzn.finite_precision_model (false)
+    parser.add_argument("--finite-precision-model",
+                        help=("Print infinite-precision rational numbers "
+                        "as finite precision decimals."),
+                        action="store_true", default=False)
+
+    # opt.fzn.finite_precision (32)
+    parser.add_argument("--finite-precision",
+                        help=("Sets the finite precision. Must be larger "
+                        "or equal 2."), action=check_finite_precision(),
+                        metavar="prec", type=int, default=32)
+
+    ###################
+    # IGNORED OPTIONS #
+    ###################
 
     # Ignored Options
-    parser.add_argument("--free-search", "-f", help=("No need to follow search specification. "
+    parser.add_argument("--free-search", "-f",
+                        help=("No need to follow search specification. "
                         "(OptiMathSAT always ignores all search specifications)"),
                         action="store_true", default=True)
-    parser.add_argument("--num-threads", "-p", help=("Number of threads. "
+    parser.add_argument("--num-threads", "-p",
+                        help=("Number of threads. "
                         "(OptiMathSAT can use only one thread)"),
                         metavar="N", type=int, default=1)
 
@@ -111,6 +153,20 @@ def check_file_ext(extension):
                 parser.error("file doesn't end with `{}' {}".format(extension, option_string))
             else:
                 setattr(namespace, self.dest, file.name)
+    return Act
+
+
+def check_finite_precision():
+    """Checks that the argument finite precision matches the given restriction."""
+    class Act(argparse.Action): # pylint: disable=too-few-public-methods
+        """Act."""
+        def __call__(self, parser, namespace, value, option_string=None):
+            """Check that the argument finite precision matches the given restriction."""
+            if value < 2:
+                option_string = '({})'.format(option_string) if option_string else ''
+                parser.error("minimum finite precision is 2 {}".format(option_string))
+            else:
+                setattr(namespace, self.dest, value)
     return Act
 
 
@@ -147,6 +203,13 @@ def get_cmdline_args(known_args, other_args):
 
     args.append("-opt.fzn.all_solutions={}".format(known_args.all_solutions_opt))
     args.append("-opt.fzn.partial_solutions={}".format(known_args.partial_solutions))
+
+    if (known_args.finite_precision_model):
+        args.append("-opt.fzn.finite_precision_model={}".format(known_args.finite_precision_model))
+        args.append("-opt.fzn.finite_precision={}".format(known_args.finite_precision))
+
+    if (known_args.experimental_non_linear):
+        args.append("-preprocessor.toplevel_propagation=False")
 
     if (known_args.random_seed):
         args.append("-random_seed={}".format(known_args.random_seed))
