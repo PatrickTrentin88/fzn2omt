@@ -76,6 +76,19 @@ def get_cmdline_options():
                         "With optimization problems, it enables '--partial-solutions'."),
                         action="store_true", default=False)
 
+
+    # Random Seed
+    parser.add_argument("--random-seed", "-r", help=("Set seed for pseudo-random number generators."),
+                        metavar="N", type=int, default=None)
+
+    # Ignored Options
+    parser.add_argument("--free-search", "-f", help=("No need to follow search specification. "
+                        "(OptiMathSAT always ignores all search specifications)"),
+                        action="store_true", default=True)
+    parser.add_argument("--num-threads", "-p", help=("Number of threads. "
+                        "(OptiMathSAT can use only one thread)"),
+                        metavar="N", type=int, default=1)
+
     # parse
     known_args, other_args = parser.parse_known_args()
 
@@ -134,6 +147,9 @@ def get_cmdline_args(known_args, other_args):
 
     args.append("-opt.fzn.all_solutions={}".format(known_args.all_solutions_opt))
     args.append("-opt.fzn.partial_solutions={}".format(known_args.partial_solutions))
+
+    if (known_args.random_seed):
+        args.append("-random_seed={}".format(known_args.random_seed))
 
     args.extend(other_args)
     return args
