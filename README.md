@@ -137,9 +137,12 @@ to the underlying OMT solver.
     ~$ fzn2optimathsat.py -h
     usage: fzn2optimathsat.py [-h] [--smt2 <file>.smt2] [--compile-only]
                               [--bv-enc | --int-enc] [--cardinality-networks]
-                              [--bv-alldifferent] [--partial-solutions]
-                              [--all-solutions-opt] [--max-solutions N]
-                              [--all-solutions]
+                              [--bv-alldifferent] [--random-seed N]
+                              [--experimental-non-linear] [--partial-solutions]
+                              [--all-solutions-opt] [--all-solutions]
+                              [--max-solutions N] [--finite-precision-model]
+                              [--finite-precision prec] [--free-search]
+                              [--num-threads N]
                               <model>.fzn
     
     A simple wrapper around OptiMathSAT.
@@ -157,17 +160,33 @@ to the underlying OMT solver.
       --cardinality-networks
                             Enable cardinality networks (when applicable).
       --bv-alldifferent     all-different constraints encoded with Bit-Vectors.
+      --random-seed N, -r N
+                            Set seed for pseudo-random number generators.
+      --experimental-non-linear, -e
+                            Activates experimental non-linear support. Enabling
+                            this option can negatively impact the performance.
       --partial-solutions   Print any sub-optimal solution satisfying the input
                             model.
       --all-solutions-opt   Print all solutions of the input problem. If this is
                             an optimization problem, it prints all solutions with
                             the same optimal value.
-      --max-solutions N, -n N
-                            Maximum number of solutions printed.
       --all-solutions, -a   Print all solutions of the input problem. With
                             satisfaction problems, it enables '--all-solutions-
                             opt'. With optimization problems, it enables '--
                             partial-solutions'.
+      --max-solutions N, -n N
+                            Maximum number of solutions printed.
+      --finite-precision-model
+                            Print infinite-precision rational numbers as finite
+                            precision decimals.
+      --finite-precision prec
+                            Sets the finite precision. Must be larger or equal 2.
+      --free-search, -f     No need to follow search specification. (OptiMathSAT
+                            always ignores all search specifications)
+      --num-threads N, -p N
+                            Number of threads. (OptiMathSAT can use only one
+                            thread)
+
 
 The option to set the desired multi-objective optimization is:
 
