@@ -252,7 +252,7 @@ the model in a `DZN`-friendly format.
       open = array1d(1..5, [true, true, true, false, true]);
       cost = array1d(1..10, [30, 27, 70, 2, 4, 22, 5, 13, 35, 55]);
       ----------
-      =========
+      ==========
 
 - all solutions with the same optimal value:
 
@@ -269,30 +269,30 @@ the model in a `DZN`-friendly format.
       r1 = true;
       r2 = false;
       ----------
-      =========
+      ==========
 
 - all partial solutions encountered along the optimization search:
 
-    ~$ fzn2optimathsat.py examples/flatzinc_allsolutions.fzn --partial-solutions
-    % objective: x (model)
-    x = 2;
-    y = 0;
-    r1 = true;
-    r2 = true;
-    ----------
-    % objective: x (model)
-    x = 3;
-    y = 0;
-    r1 = true;
-    r2 = false;
-    ----------
-    % objective: x (optimal model)
-    x = 3;
-    y = 0;
-    r1 = true;
-    r2 = false;
-    ----------
-    =========
+      ~$ fzn2optimathsat.py examples/flatzinc_allsolutions.fzn --partial-solutions
+      % objective: x (model)
+      x = 2;
+      y = 0;
+      r1 = true;
+      r2 = true;
+      ----------
+      % objective: x (model)
+      x = 3;
+      y = 0;
+      r1 = true;
+      r2 = false;
+      ----------
+      % objective: x (optimal model)
+      x = 3;
+      y = 0;
+      r1 = true;
+      r2 = false;
+      ----------
+      ==========
 
 - multi-objective optimization:
 
@@ -305,14 +305,14 @@ the model in a `DZN`-friendly format.
       x = 0;
       y = 3;
       ----------
-      =========
+      ==========
 
       ~$ fzn2optimathsat.py examples/flatzinc_multiobjective.fzn -opt.priority=lex
       % lexicographic search (optimal model)
       x = 3;
       y = 1;
       ----------
-      =========
+      ==========
 
       ~$ fzn2optimathsat.py examples/flatzinc_multiobjective.fzn -opt.priority=par
       % pareto search (optimal model)
@@ -327,7 +327,7 @@ the model in a `DZN`-friendly format.
       x = 2;
       y = 2;
       ----------
-      =========
+      ==========
 
 
 ## Example #02: Solving with [Barcelogic](https://barcelogic.com/)
