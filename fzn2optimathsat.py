@@ -106,15 +106,12 @@ def get_cmdline_options():
     ##################
 
     # opt.fzn.finite_precision_model (false)
-    #parser.add_argument("--finite-precision-model",
-    #                    help=("Print infinite-precision rational numbers "
-    #                    "as finite precision decimals."),
-    #                    action="store_true", default=False)
-
     # opt.fzn.finite_precision (32)
     parser.add_argument("--finite-precision",
-                        help=("Sets the finite precision. Must be larger "
-                        "or equal 2."), action=check_finite_precision(),
+                        help=("Print infinite-precision rational numbers "
+                        "as finite precision decimals using the specified "
+                        "precision level. Must be larger or equal 2."),
+                        action=check_finite_precision(),
                         metavar="prec", type=int, default=None)
 
     ###################

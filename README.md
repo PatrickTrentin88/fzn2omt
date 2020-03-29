@@ -140,9 +140,8 @@ to the underlying OMT solver.
                               [--bv-alldifferent] [--random-seed N]
                               [--experimental-non-linear] [--partial-solutions]
                               [--all-solutions-opt] [--all-solutions]
-                              [--max-solutions N] [--finite-precision-model]
-                              [--finite-precision prec] [--free-search]
-                              [--num-threads N]
+                              [--max-solutions N] [--finite-precision prec]
+                              [--free-search] [--num-threads N]
                               <model>.fzn
     
     A simple wrapper around OptiMathSAT.
@@ -176,11 +175,10 @@ to the underlying OMT solver.
                             partial-solutions'.
       --max-solutions N, -n N
                             Maximum number of solutions printed.
-      --finite-precision-model
-                            Print infinite-precision rational numbers as finite
-                            precision decimals.
       --finite-precision prec
-                            Sets the finite precision. Must be larger or equal 2.
+                            Print infinite-precision rational numbers as finite
+                            precision decimals using the specified precision
+                            level. Must be larger or equal 2.
       --free-search, -f     No need to follow search specification. (OptiMathSAT
                             always ignores all search specifications)
       --num-threads N, -p N
