@@ -106,16 +106,16 @@ def get_cmdline_options():
     ##################
 
     # opt.fzn.finite_precision_model (false)
-    parser.add_argument("--finite-precision-model",
-                        help=("Print infinite-precision rational numbers "
-                        "as finite precision decimals."),
-                        action="store_true", default=False)
+    #parser.add_argument("--finite-precision-model",
+    #                    help=("Print infinite-precision rational numbers "
+    #                    "as finite precision decimals."),
+    #                    action="store_true", default=False)
 
     # opt.fzn.finite_precision (32)
     parser.add_argument("--finite-precision",
                         help=("Sets the finite precision. Must be larger "
                         "or equal 2."), action=check_finite_precision(),
-                        metavar="prec", type=int, default=32)
+                        metavar="prec", type=int, default=None)
 
     ###################
     # IGNORED OPTIONS #
@@ -204,8 +204,8 @@ def get_cmdline_args(known_args, other_args):
     args.append("-opt.fzn.all_solutions={}".format(known_args.all_solutions_opt))
     args.append("-opt.fzn.partial_solutions={}".format(known_args.partial_solutions))
 
-    if (known_args.finite_precision_model):
-        args.append("-opt.fzn.finite_precision_model={}".format(known_args.finite_precision_model))
+    if (known_args.finite_precision):
+        args.append("-opt.fzn.finite_precision_model=True")
         args.append("-opt.fzn.finite_precision={}".format(known_args.finite_precision))
 
     if (known_args.experimental_non_linear):
