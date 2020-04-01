@@ -129,7 +129,11 @@ def fzn2smt2(known_args, other_args):
     known_args.compile_only=True
     known_args.partial_solutions=False
     known_args.all_solutions=False
+    known_args.all_solutions_opt=False
     known_args.max_solutions=0
+    known_args.random_seed=None
+    known_args.experimental_non_linear=False
+    known_args.finite_precision=None
     fzn2optimathsat.optimathsat(known_args, other_args)
 
 
