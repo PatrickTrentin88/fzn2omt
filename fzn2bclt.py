@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 #!python
 
+"""
+A compiler from FlatZinc to SMT-LIB v2 enriched with Barcelogic optimization extensions.
+"""
+
 import argparse
-import fzn2smt2
 import os
 import subprocess
 import sys
 from shutil import which
+import fzn2smt2
 
 ###
 ### MAIN
@@ -27,27 +31,31 @@ def main():
 
 def get_cmdline_options():
     """parses and returns input parameters."""
-    parser = argparse.ArgumentParser(description="A tool for solving FlatZinc problems with bclt.")
+    parser = argparse.ArgumentParser(description=("A tool for solving FlatZinc "
+                                                  "problems with bclt."))
 
     main_group = parser.add_argument_group("Main Options")
 
     main_group.add_argument("model", metavar="<model>.fzn", type=argparse.FileType('r'),
-                        help="The FlatZinc model", action=check_file_ext('fzn'))
+                            help="The FlatZinc model", action=check_file_ext('fzn'))
 
     main_group.add_argument("--success", help="Print success as response to commands",
-                        action="store_true", default=False)
+                            action="store_true", default=False)
 
     enc_group = parser.add_argument_group("Encoding Options")
 
     # opt.fzn.asoft_encoding (true)
-    enc_group.add_argument("--cardinality-networks", help="Enable cardinality networks (when applicable).",
-                        action="store_true", default=False)
+    enc_group.add_argument("--cardinality-networks",
+                           help="Enable cardinality networks (when applicable).",
+                           action="store_true", default=False)
 
     # bclt bounds
-    enc_group.add_argument("--bclt-lower", help="Set the default lower-bound for any objective when using the bclt solver.",
-                           default="-1000000000")
-    enc_group.add_argument("--bclt-upper", help="Set the default upper-bound for any objective when using the bclt solver",
-                           default="1000000000")
+    enc_group.add_argument("--bclt-lower",
+                           help=("Set the default lower-bound for any objective when "
+                                 "using the bclt solver."), default="-1000000000")
+    enc_group.add_argument("--bclt-upper",
+                           help=("Set the default upper-bound for any objective when "
+                                 "using the bclt solver"), default="1000000000")
 
     # parse
     known_args, other_args = parser.parse_known_args()
@@ -83,7 +91,7 @@ def check_file_ext(extension):
 
 def get_cmdline_args(known_args, other_args):
     """Determines the command-line arguments for the optimathsat call."""
-    args = ["bclt", "-file", known_args.smt2 ]
+    args = ["bclt", "-file", known_args.smt2]
 
     if not known_args.success:
         args.extend(["-success", "false"])
@@ -93,6 +101,7 @@ def get_cmdline_args(known_args, other_args):
 
 
 def run_bclt(known_args, other_args):
+    """Solves a FlatZinc problem with Barcelogic."""
 
     if which("bclt") is None:
         sys.exit("error: the binary of `bclt' has not been found in the path.")
@@ -117,6 +126,3 @@ if __name__ == "__main__":
         sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
 
     main()
-
-
-
