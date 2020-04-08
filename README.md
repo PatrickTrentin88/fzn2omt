@@ -45,7 +45,7 @@ compiler for
 
 # INSTALLATION
 
-The scripts require `Python 3.5` or superior.
+The scripts require `Python 3.7` or superior.
 
 To install the scripts, add the current directory
 to the `PATH` environment variable:
