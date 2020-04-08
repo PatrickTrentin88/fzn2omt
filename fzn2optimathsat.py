@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 #!python
 
+"""
+An simple wrapper around the FlatZinc interface of OptiMathSAT, and
+a compiler from FlatZinc to SMT-LIB enriched with OptiMathSAT extensions.
+"""
+
 import argparse
 import fileinput
 import mmap
@@ -47,9 +52,9 @@ def get_cmdline_options():
     # opt.fzn.bv_integers (false)
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--bv-enc", help="Encode ints with the SMT-LIB Bit-Vector type.",
-                        action="store_true", default=False)
+                       action="store_true", default=False)
     group.add_argument("--int-enc", help="Encode ints with the SMT-LIB Int type.",
-                        action="store_true", default=True)
+                       action="store_true", default=True)
 
     # opt.fzn.asoft_encoding (true)
     parser.add_argument("--cardinality-networks",
@@ -74,26 +79,27 @@ def get_cmdline_options():
     # non-linear
     parser.add_argument("--experimental-non-linear", "-e",
                         help=("Activates experimental non-linear support. "
-                        "Enabling this option can negatively impact the "
-                        "performance."), action="store_true", default=False)
+                              "Enabling this option can negatively impact the "
+                              "performance."), action="store_true", default=False)
 
     # opt.fzn.partial_solutions (false)
     parser.add_argument("--partial-solutions",
                         help=("Print any sub-optimal solution satisfying "
-                        "the input model."), action="store_true", default=False)
+                              "the input model."), action="store_true", default=False)
 
     # opt.fzn.all_solutions (false)
     parser.add_argument("--all-solutions-opt",
                         help=("Print all solutions of the input problem. "
-                        "If this is an optimization problem, it prints all "
-                        "solutions with the same optimal value."),
+                              "If this is an optimization problem, it prints all "
+                              "solutions with the same optimal value."),
                         action="store_true", default=False)
 
     # MiniZinc style all solutions
     parser.add_argument("--all-solutions", "-a",
                         help=("Print all solutions of the input problem. "
-                        "With satisfaction problems, it enables '--all-solutions-opt'. "
-                        "With optimization problems, it enables '--partial-solutions'."),
+                              "With satisfaction problems, it enables "
+                              "'--all-solutions-opt'. With optimization "
+                              "problems, it enables '--partial-solutions'."),
                         action="store_true", default=False)
 
     # opt.fzn.max_solutions (0)
@@ -109,8 +115,8 @@ def get_cmdline_options():
     # opt.fzn.finite_precision (32)
     parser.add_argument("--finite-precision",
                         help=("Print infinite-precision rational numbers "
-                        "as finite precision decimals using the specified "
-                        "precision level. Must be larger or equal 2."),
+                              "as finite precision decimals using the specified "
+                              "precision level. Must be larger or equal 2."),
                         action=check_finite_precision(),
                         metavar="prec", type=int, default=None)
 
@@ -121,11 +127,10 @@ def get_cmdline_options():
     # Ignored Options
     parser.add_argument("--free-search", "-f",
                         help=("No need to follow search specification. "
-                        "(OptiMathSAT always ignores all search specifications)"),
+                              "(OptiMathSAT always ignores all search specifications)"),
                         action="store_true", default=True)
     parser.add_argument("--num-threads", "-p",
-                        help=("Number of threads. "
-                        "(OptiMathSAT can use only one thread)"),
+                        help=("Number of threads. (OptiMathSAT can use only one thread)"),
                         metavar="N", type=int, default=1)
 
     # parse
@@ -173,7 +178,7 @@ def check_finite_precision():
 
 def get_cmdline_args(known_args, other_args):
     """Determines the command-line arguments for the optimathsat call."""
-    args = ["optimathsat", "-input=fzn", known_args.model ]
+    args = ["optimathsat", "-input=fzn", known_args.model]
 
     if known_args.smt2:
         args.extend(["-debug.api_call_trace=1",
@@ -192,37 +197,39 @@ def get_cmdline_args(known_args, other_args):
     args.append("-opt.fzn.bv_all_different={}".format(known_args.bv_alldifferent))
     args.append("-opt.fzn.max_solutions={}".format(known_args.max_solutions))
 
-    if (known_args.all_solutions):
+    if known_args.all_solutions:
         if is_optimization_problem(known_args.model):
-            known_args.partial_solutions=True
+            known_args.partial_solutions = True
         else:
-            known_args.all_solutions_opt=True
+            known_args.all_solutions_opt = True
 
     args.append("-opt.fzn.all_solutions={}".format(known_args.all_solutions_opt))
     args.append("-opt.fzn.partial_solutions={}".format(known_args.partial_solutions))
 
-    if (known_args.finite_precision):
+    if known_args.finite_precision:
         args.append("-opt.fzn.finite_precision_model=True")
         args.append("-opt.fzn.finite_precision={}".format(known_args.finite_precision))
 
-    if (known_args.experimental_non_linear):
+    if known_args.experimental_non_linear:
         args.append("-preprocessor.toplevel_propagation=False")
 
-    if (known_args.random_seed):
+    if known_args.random_seed:
         args.append("-random_seed={}".format(known_args.random_seed))
 
     args.extend(other_args)
     return args
 
+
 def is_optimization_problem(fzn_file):
-    with open(fzn_file, 'r') as fd:
-        fd_mmap = mmap.mmap(fd.fileno(), 0, access=mmap.ACCESS_READ)
-        if re.search(b"solve .*satisfy;", fd_mmap) is not None:
-            return False
-        else:
-            return True
+    """Checks whether the FlatZinc problem contains an optimization goal."""
+    with open(fzn_file, 'r') as fd_fzn:
+        fd_mmap = mmap.mmap(fd_fzn.fileno(), 0, access=mmap.ACCESS_READ)
+        return re.search(b"solve .*satisfy;", fd_mmap) is None
+
 
 def print_config(known_args, target_solver):
+    """Prints the compiler configuration used to generate an
+    SMT-LIB formula."""
     print(";; encoder configuration:")
     print(";;    --int-enc={}".format(known_args.int_enc))
     print(";;    --bv-enc={}".format(known_args.bv_enc))
@@ -235,16 +242,19 @@ def print_config(known_args, target_solver):
 def mangle_smt2_for_optimathsat(known_args, other_args, is_opt):
     """Modifies SMT-LIB file with OptiMathSAT-specific syntax."""
 
-    with fileinput.input(known_args.smt2, inplace=True) as fd:
-        for line in fd:
+    with fileinput.input(known_args.smt2, inplace=True) as fd_smt2:
+        for line in fd_smt2:
             if line[1:11] == "set-option":
                 print_config(known_args, "optimathsat")
                 print(line, end='')
                 print("(set-option :produce-models true)")
 
                 if is_opt:
-                    priority_list = list(filter(lambda h: len(h) == 3, map(lambda g: g[14:], filter(lambda f: "-opt.priority=" in f, other_args))))
-                    if len(priority_list) > 0:
+                    priority_list = list(filter(lambda h: len(h) == 3,
+                                                map(lambda g: g[14:],
+                                                    filter(lambda f: "-opt.priority="
+                                                           in f, other_args))))
+                    if priority_list:
                         priority = priority_list[-1]
                         print("(set-option :opt.priority {})".format(priority))
                         print("(set-option :config opt.par.mode=callback)")
@@ -264,17 +274,23 @@ def mangle_smt2_for_optimathsat(known_args, other_args, is_opt):
 
 
 def get_objective(known_args, line):
+    """Collects information about an optimization goal
+    declaration in SMT-LIB enriched with OptiMathSAT
+    optimization extensions."""
     ret = None
-    regex = re.compile(r"\((minimize|maximize) ([^:]*?) ?(:signed)? ?(:lower ([^:]*?))? ?(:upper ([^:]*?))?\)$")
+    regex = re.compile((r"\((minimize|maximize) ([^:]*?) ?(:signed)? ?"
+                        r"(:lower ([^:]*?))? ?(:upper ([^:]*?))?\)$"))
     matches = regex.findall(line)
-    if len(matches) > 0:
+    if matches:
         match = matches[0]
         ret = {
             "minimize" : match[0] == 'minimize',
             "goal"     : match[1],
             "signed"   : match[2] == ':signed',
-            "lower"    : match[4] if known_args.solver != "bclt" or match[4] != '' else known_args.bclt_lower,
-            "upper"    : match[6] if known_args.solver != "bclt" or match[6] != '' else known_args.bclt_upper,
+            "lower"    : match[4] if known_args.solver != "bclt" or match[4] != ''
+                         else known_args.bclt_lower,
+            "upper"    : match[6] if known_args.solver != "bclt" or match[6] != ''
+                         else known_args.bclt_upper,
             "is_bv"    : known_args.bv_enc,
         }
         assert ret["signed"], "error: unexpected unsigned goal."
@@ -283,6 +299,7 @@ def get_objective(known_args, line):
 
 
 def bclt_print_objective(obj):
+    """Print an optimization goal using the syntax of Barcelogic."""
     goal = obj["goal"] if obj["minimize"] else "(- {})".format(obj["goal"])
     lower = int(obj["lower"]) if obj["minimize"] else int(obj["upper"]) * -1
     upper = int(obj["upper"]) if obj["minimize"] else int(obj["lower"]) * -1
@@ -293,14 +310,12 @@ def bclt_print_objective(obj):
     print("(check-omt {} {} {})".format(goal, lower, upper))
 
 
-def mangle_smt2_for_bclt(known_args, other_args, is_opt):
+def mangle_smt2_for_bclt(known_args, other_args, is_opt): # pylint: disable=unused-argument
     """Modifies SMT-LIB file with BCLT-specific syntax."""
 
-    regex = re.compile(b"\((minimize|maximize) (.*?) ?(:signed)? ?(:lower (.*?))? ?(:upper (.*?))?\)")
-
     num_objectives = 0
-    with fileinput.input(known_args.smt2, inplace=True) as fd:
-        for line in fd:
+    with fileinput.input(known_args.smt2, inplace=True) as fd_smt2:
+        for line in fd_smt2:
 
             # set logic
             if line[1:11] == "set-option":
@@ -340,6 +355,7 @@ def mangle_smt2_for_bclt(known_args, other_args, is_opt):
 
 
 def z3_print_objective(known_args, obj, decls):
+    """Print an optimization goal using the syntax of Z3."""
     if known_args.bv_enc:
         z3_print_bv_objective(obj, decls)
     else:
@@ -347,10 +363,11 @@ def z3_print_objective(known_args, obj, decls):
 
 
 def z3_print_lira_objective(obj):
-    if len(obj["lower"]) > 0:
+    """Print a LIRA optimization goal using the syntax of Z3."""
+    if obj["lower"]:
         print("(assert (<= {} {}))".format(obj["lower"], obj["goal"]))
 
-    if len(obj["upper"]) > 0:
+    if obj["upper"]:
         print("(assert (<= {} {}))".format(obj["goal"], obj["upper"]))
 
     if obj["minimize"]:
@@ -360,17 +377,19 @@ def z3_print_lira_objective(obj):
 
 
 def z3_print_bv_objective(obj, decls):
+    """Print a BV optimization goal using the syntax of Z3."""
     if obj["goal"] not in decls.keys():
         sys.exit("error: declaration for objective '{}' not found.".format(obj["goal"]))
 
     nbits = int(re.findall("([0-9]+)", decls[obj["goal"]])[0])
     mask = "#b1" + "0" * (nbits - 1)
-    ubv_goal = "(bvor (bvand {} (bvnot {})) (bvand (bvnot {}) {}))".format(mask, obj["goal"], mask, obj["goal"])
+    ubv_goal = "(bvor (bvand {0} (bvnot {1})) (bvand (bvnot {0}) {1}))".format(
+                mask, obj["goal"])
 
-    if len(obj["lower"]) > 0:
+    if obj["lower"]:
         print("(assert (bvsle {} {}))".format(obj["lower"], obj["goal"]))
 
-    if len(obj["upper"]) > 0:
+    if obj["upper"]:
         print("(assert (bvsle {} {}))".format(obj["goal"], obj["upper"]))
 
     if obj["minimize"]:
@@ -379,14 +398,14 @@ def z3_print_bv_objective(obj, decls):
         print("(maximize {})".format(ubv_goal))
 
 
-def mangle_smt2_for_z3(known_args, other_args, is_opt):
+def mangle_smt2_for_z3(known_args, other_args, is_opt): # pylint: disable=unused-argument
     """Modifies SMT-LIB file with Z3-specific syntax."""
 
-    regex = re.compile(" (.*?) \(\) (\(_ BitVec [0-9]*\))")
+    regex = re.compile(r" (.*?) \(\) (\(_ BitVec [0-9]*\))")
 
     decls = {}
-    with fileinput.input(known_args.smt2, inplace=True) as fd:
-        for line in fd:
+    with fileinput.input(known_args.smt2, inplace=True) as fd_smt2:
+        for line in fd_smt2:
 
             # set logic
             if line[1:11] == "set-option":
@@ -413,13 +432,14 @@ def mangle_smt2_for_z3(known_args, other_args, is_opt):
                 # else: print line
                 else:
                     matches = regex.findall(line)
-                    if len(matches) > 0:
+                    if matches:
                         decls[matches[0][0]] = matches[0][1]
 
                     print(line, end='')
 
 
 def optimathsat(known_args, other_args):
+    """Calls OptiMathSAT."""
     args = get_cmdline_args(known_args, other_args)
 
     if which("optimathsat") is None:
@@ -429,7 +449,7 @@ def optimathsat(known_args, other_args):
         result = subprocess.run(args, capture_output=True, text=True)
 
         # print stderr
-        if len(result.stderr) > 0:
+        if result.stderr:
             print(result.stderr, end='')
 
     else:
@@ -459,6 +479,3 @@ if __name__ == "__main__":
         sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
 
     main()
-
-
-
