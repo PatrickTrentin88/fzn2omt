@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 #!python
 
+"""
+A compiler from FlatZinc to SMT-LIB enriched with Z3 optimization extensions.
+"""
+
 import argparse
-import fzn2smt2
 import os
 import subprocess
 import sys
 from shutil import which
+import fzn2smt2
 
 ###
 ### MAIN
@@ -27,28 +31,31 @@ def main():
 
 def get_cmdline_options():
     """parses and returns input parameters."""
-    parser = argparse.ArgumentParser(description="A tool for solving FlatZinc problems with z3.")
+    parser = argparse.ArgumentParser(description=("A tool for solving FlatZinc "
+                                                  "problems with z3."))
 
     main_group = parser.add_argument_group("Main Options")
 
     main_group.add_argument("model", metavar="<model>.fzn", type=argparse.FileType('r'),
-                        help="The FlatZinc model", action=check_file_ext('fzn'))
+                            help="The FlatZinc model", action=check_file_ext('fzn'))
 
     enc_group = parser.add_argument_group("Encoding Options")
     # opt.fzn.bv_integers (false)
     group = enc_group.add_mutually_exclusive_group()
     group.add_argument("--bv-enc", help="Encode ints with the SMT-LIB Bit-Vector type.",
-                        action="store_true", default=False)
+                       action="store_true", default=False)
     group.add_argument("--int-enc", help="Encode ints with the SMT-LIB Int type.",
-                        action="store_true", default=True)
+                       action="store_true", default=True)
 
     # opt.fzn.asoft_encoding (true)
-    enc_group.add_argument("--cardinality-networks", help="Enable cardinality networks (when applicable).",
-                        action="store_true", default=False)
+    enc_group.add_argument("--cardinality-networks",
+                           help="Enable cardinality networks (when applicable).",
+                           action="store_true", default=False)
 
     # opt.fzn.bv_all_different (true)
-    enc_group.add_argument("--bv-alldifferent", help="all-different constraints encoded with Bit-Vectors.",
-                        action="store_true", default=False)
+    enc_group.add_argument("--bv-alldifferent",
+                           help="all-different constraints encoded with Bit-Vectors.",
+                           action="store_true", default=False)
 
     # parse
     known_args, other_args = parser.parse_known_args()
@@ -81,13 +88,14 @@ def check_file_ext(extension):
 
 def get_cmdline_args(known_args, other_args):
     """Determines the command-line arguments for the optimathsat call."""
-    args = ["z3", known_args.smt2 ]
+    args = ["z3", known_args.smt2]
 
     args.extend(other_args)
     return args
 
 
 def run_z3(known_args, other_args):
+    """Calls Z3."""
 
     if which("z3") is None:
         sys.exit("error: the binary of `z3' has not been found in the path.")
@@ -112,6 +120,3 @@ if __name__ == "__main__":
         sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
 
     main()
-
-
-
