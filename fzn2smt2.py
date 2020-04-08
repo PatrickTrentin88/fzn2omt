@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 #!python
 
+"""
+A compiler from FlatZinc to SMT-LIB v2 enriched with optimization extensions.
+"""
+
 import argparse
 import os
 import sys
@@ -26,42 +30,47 @@ def main():
 
 def get_cmdline_options():
     """parses and returns input parameters."""
-    parser = argparse.ArgumentParser(description="A FlatZinc compiler to SMT-LIBv2 with OMT extensions.")
+    parser = argparse.ArgumentParser(description=("A FlatZinc compiler to SMT-LIBv2 "
+                                                  "with OMT extensions."))
 
     main_group = parser.add_argument_group("Main Options")
 
     main_group.add_argument("model", metavar="<model>.fzn", type=argparse.FileType('r'),
-                        help="The FlatZinc model", action=check_file_ext('fzn'))
+                            help="The FlatZinc model", action=check_file_ext('fzn'))
 
-    main_group.add_argument("--smt2", metavar="<file>.smt2",
-                        type=argparse.FileType('w'), help="Filename for the generated SMT-LIB output",
-                        default=None, action=check_file_ext('smt2'))
+    main_group.add_argument("--smt2", metavar="<file>.smt2", type=argparse.FileType('w'),
+                            help="Filename for the generated SMT-LIB output",
+                            default=None, action=check_file_ext('smt2'))
 
     main_group.add_argument("--solver", choices=["bclt", "optimathsat", "z3"],
-                            help="The SMT-LIB output must be compatible with the target OMT solver.",
-                            default="optimathsat")
+                            help=("The SMT-LIB output must be compatible with the "
+                                  "target OMT solver."), default="optimathsat")
 
     enc_group = parser.add_argument_group("Encoding Options")
     # opt.fzn.bv_integers (false)
     group = enc_group.add_mutually_exclusive_group()
     group.add_argument("--bv-enc", help="Encode ints with the SMT-LIB Bit-Vector type.",
-                        action="store_true", default=False)
+                       action="store_true", default=False)
     group.add_argument("--int-enc", help="Encode ints with the SMT-LIB Int type.",
-                        action="store_true", default=True)
+                       action="store_true", default=True)
 
     # opt.fzn.asoft_encoding (true)
-    enc_group.add_argument("--cardinality-networks", help="Enable cardinality networks (when applicable).",
-                        action="store_true", default=False)
+    enc_group.add_argument("--cardinality-networks",
+                           help="Enable cardinality networks (when applicable).",
+                           action="store_true", default=False)
 
     # opt.fzn.bv_all_different (true)
-    enc_group.add_argument("--bv-alldifferent", help="all-different constraints encoded with Bit-Vectors.",
-                        action="store_true", default=False)
+    enc_group.add_argument("--bv-alldifferent",
+                           help="all-different constraints encoded with Bit-Vectors.",
+                           action="store_true", default=False)
 
     # bclt bounds
-    enc_group.add_argument("--bclt-lower", help="Set the default lower-bound for any objective when using the bclt solver.",
-                           default="-1000000000")
-    enc_group.add_argument("--bclt-upper", help="Set the default upper-bound for any objective when using the bclt solver",
-                           default="1000000000")
+    enc_group.add_argument("--bclt-lower",
+                           help=("Set the default lower-bound for any objective when "
+                                 "using the bclt solver."), default="-1000000000")
+    enc_group.add_argument("--bclt-upper",
+                           help=("Set the default upper-bound for any objective when "
+                                 "using the bclt solver"), default="1000000000")
 
     # parse
     known_args, other_args = parser.parse_known_args()
@@ -98,7 +107,7 @@ def check_file_ext(extension):
 
 def get_cmdline_args(known_args, other_args):
     """Determines the command-line arguments for the optimathsat call."""
-    args = ["optimathsat", "-input=fzn", known_args.model ]
+    args = ["optimathsat", "-input=fzn", known_args.model]
 
     if known_args.smt2:
         args.extend(["-debug.api_call_trace=1",
@@ -124,16 +133,16 @@ def get_cmdline_args(known_args, other_args):
 
 
 def fzn2smt2(known_args, other_args):
-
+    """Transforms a FlatZinc model in a SMT-LIB formula."""
     # Generate SMT-LIB file
-    known_args.compile_only=True
-    known_args.partial_solutions=False
-    known_args.all_solutions=False
-    known_args.all_solutions_opt=False
-    known_args.max_solutions=0
-    known_args.random_seed=None
-    known_args.experimental_non_linear=False
-    known_args.finite_precision=None
+    known_args.compile_only = True
+    known_args.partial_solutions = False
+    known_args.all_solutions = False
+    known_args.all_solutions_opt = False
+    known_args.max_solutions = 0
+    known_args.random_seed = None
+    known_args.experimental_non_linear = False
+    known_args.finite_precision = None
     fzn2optimathsat.optimathsat(known_args, other_args)
 
 
@@ -148,6 +157,3 @@ if __name__ == "__main__":
         sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
 
     main()
-
-
-
