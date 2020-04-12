@@ -414,7 +414,7 @@ def mangle_smt2_for_z3(known_args, other_args, is_opt): # pylint: disable=unused
                 if known_args.bv_enc:
                     print("(set-logic QF_BV)")
                 else:
-                    print("(set-logic QF_LIRA)")
+                    print("(set-logic QF_NIRA)")
                 print("(set-option :produce-models true)")
                 if known_args.bv_enc:
                     print("(set-option :pp.bv-literals false)")
@@ -455,7 +455,7 @@ def mangle_smt2_for_cvc4(known_args, other_args, is_opt): # pylint: disable=unus
                 if known_args.bv_enc:
                     print("(set-logic QF_BV)")
                 else:
-                    print("(set-logic QF_LIRA)")
+                    print("(set-logic QF_NIRA)")
                 print("(set-option :produce-models true)")
 
             # get model
