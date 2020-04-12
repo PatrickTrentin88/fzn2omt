@@ -5,6 +5,9 @@ like, e.g., [Barcelogic](https://barcelogic.com/),
 [OptiMathSAT](http://optimathsat.disi.unitn.it/) and
 [z3](https://github.com/Z3Prover/z3).
 
+Satisfaction FlatZinc models can also be solved with Satisfiability Modulo
+Theories solvers like, e.g., [CVC4](https://cvc4.github.io/).
+
 The FlatZinc model can be generated using the standard
 [minizinc](https://www.minizinc.org/)
 compiler or the customized
@@ -17,8 +20,9 @@ compiler for
 
 - All tools support the encoding based on the `QF_LIRA` logic
   (option `--int-enc`).
-  Both [OptiMathSAT](http://optimathsat.disi.unitn.it/) and
-  [z3](https://github.com/Z3Prover/z3) support also the encoding
+  [OptiMathSAT](http://optimathsat.disi.unitn.it/),
+  [z3](https://github.com/Z3Prover/z3) and
+  [CVC4](https://cvc4.github.io/) support also the encoding
   based on the `QF_BV` logic (option `--bv-enc`).
 
 
@@ -54,8 +58,9 @@ to the `PATH` environment variable:
 
 It is also necessary to add the binaries of
 [Barcelogic](https://barcelogic.com/),
-[OptiMathSAT](http://optimathsat.disi.unitn.it/) and
-[z3](https://github.com/Z3Prover/z3)
+[OptiMathSAT](http://optimathsat.disi.unitn.it/),
+[z3](https://github.com/Z3Prover/z3) and
+[CVC4](https://cvc4.github.io/)
 to the `PATH` environment variable.
 
 Notice that the conversion from **FlatZinc** to **SMT-LIB** (v. 2)
@@ -89,7 +94,7 @@ to the underlying OMT solver.
     Main Options:
       <model>.fzn           The FlatZinc model
       --smt2 <file>.smt2    Filename for the generated SMT-LIB output
-      --solver {bclt,optimathsat,z3}
+      --solver {bclt,cvc4,optimathsat,z3}
                             The SMT-LIB output must be compatible with the target
                             OMT solver.
     
@@ -131,6 +136,29 @@ to the underlying OMT solver.
       --bclt-upper BCLT_UPPER
                             Set the default upper-bound for any objective when
                             using the bclt solver
+
+## fzn2cvc4.py
+
+    ~$ fzn2cvc4.py -h
+    usage: fzn2cvc4.py [-h] [--bv-enc | --int-enc] [--cardinality-networks]
+                       [--bv-alldifferent]
+                       <model>.fzn
+    
+    A tool for solving FlatZinc problems with cvc4.
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+    
+    Main Options:
+      <model>.fzn           The FlatZinc model
+    
+    Encoding Options:
+      --bv-enc              Encode ints with the SMT-LIB Bit-Vector type.
+      --int-enc             Encode ints with the SMT-LIB Int type.
+      --cardinality-networks
+                            Enable cardinality networks (when applicable).
+      --bv-alldifferent     all-different constraints encoded with Bit-Vectors.
+
 
 ## fzn2optimathsat.py
 
@@ -378,6 +406,25 @@ targets. Therefore, the actual minimization goal is replaced with a
 custom maximization objective that forces the minimization of the
 original goal. When this happens, the value printed in the first lines
 of the output is not the optimal value of the original objective function.
+
+## Example #04: Solving with [CVC4](https://cvc4.github.io/)
+
+    ~$ fzn2cvc4.py examples/coloring.fzn
+    sat
+    (model
+    (define-fun numColors () Int 4)
+    (define-fun X_INTRODUCED_0_ () Int 1)
+    (define-fun X_INTRODUCED_1_ () Int 1)
+    (define-fun X_INTRODUCED_2_ () Int 2)
+    (define-fun X_INTRODUCED_3_ () Int 3)
+    (define-fun X_INTRODUCED_4_ () Int 4)
+    (define-fun X_INTRODUCED_5_ () Int 4)
+    )
+
+**Note:** when dealing with FlatZinc models with an optimization goal,
+the FlatZinc model is compiled to SMT-LIB without the optimization
+goal because [CVC4](https://cvc4.github.io/) does not support it.
+
 
 # NOTES
 
