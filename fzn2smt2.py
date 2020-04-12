@@ -42,7 +42,7 @@ def get_cmdline_options():
                             help="Filename for the generated SMT-LIB output",
                             default=None, action=check_file_ext('smt2'))
 
-    main_group.add_argument("--solver", choices=["bclt", "optimathsat", "z3"],
+    main_group.add_argument("--solver", choices=["bclt", "cvc4", "optimathsat", "z3"],
                             help=("The SMT-LIB output must be compatible with the "
                                   "target OMT solver."), default="optimathsat")
 
