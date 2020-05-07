@@ -159,6 +159,7 @@ def smtlib_to_python_type(stype, value):
     ret = switch[stype](value)
 
     if ret is None:
+        eprint("error: unable to convert `{}` of type `{}`.".format(value, stype))
         raise Exception("error: smtlib_to_python_type. please report this exception.")
 
     return ret
