@@ -236,6 +236,8 @@ def make_smtlib_compatible_with_zthree(config, optimathsat_config): # pylint: di
                 elif common.match_check_sat(line):
                     continue
                 else:
+                    if config.bv_enc:
+                        line = line.replace(b'_ to_bv ', b'_ int2bv ')
                     out_f.write(line.decode("utf-8"))
 
             # footer
