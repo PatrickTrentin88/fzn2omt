@@ -155,6 +155,9 @@ def cvc4_extract_models(tracefile):
                 if "BitVec" in stype:
                     stype = "BitVec"
 
+                var = var.replace('_@_', '|')
+                var = var.replace('_@@_', ':')
+
                 if re.match(regex_pvt, var):
                     var = ".{}".format(var[9:])
 
@@ -244,6 +247,8 @@ def make_smtlib_compatible_with_cvc4(config, optimathsat_config): # pylint: disa
                 elif common.match_check_sat(line):
                     continue
                 else:
+                    line = line.replace(b'|', b'_@_')
+                    line = line.replace(b':', b'_@@_')
                     line = line.replace(b' .', b' _private_')
                     out_f.write(line.decode("utf-8"))
 

@@ -206,9 +206,10 @@ def smtlib_real_to_python_fraction(value):
 
         ret = Fraction(int(num), int(den))
     else:
-        to_int = smtlib_int_to_python_int(value)
-        if to_int is not None:
-            ret = Fraction(to_int, 1)
+        try:
+            ret = Fraction(value)
+        except ValueError:
+            pass
 
     return ret
 
@@ -413,7 +414,7 @@ def extract_solution_skeleton(ovars_file): # pylint: disable=R0914
 
     regex_bsc = re.compile(r"% (.*) = (.*);")
     regex_arr = re.compile(r"array(.*)d\((.*) (\[.*\])\)")
-    regex_raw = re.compile(r"\{[\,\w\.\s]+\}|[-\/\w\.]+")
+    regex_raw = re.compile(r"\{.+?\}|[^, \[\]]+")
 
     if not is_file_empty(ovars_file):
         with io.open(ovars_file, 'rt') as in_f:
@@ -453,7 +454,7 @@ def extract_solution_skeleton(ovars_file): # pylint: disable=R0914
 def skeleton_term_to_python(term):
     """Converts a skeleton term/value to a Python type."""
     regex_set = re.compile(r"\{.*\}")
-    regex_ext = re.compile(r"[\w\d\.]+")
+    regex_ext = re.compile(r"[\w\d\.\:\-]+")
 
     ret = None
     if re.match(regex_set, term):
