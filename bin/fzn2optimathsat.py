@@ -114,13 +114,11 @@ def optimathsat_compile(config, solver_config=None):
         print(result.stdout, end='')
         if result.stderr:
             print(result.stderr, end='')
-        common.eprint(("error: failed to generate SMT-LIB formula. "
-                       "Please report this issue."))
+        common.eprint("error: failed to generate SMT-LIB formula. ")
         sys.exit(1)
 
     if common.is_file_empty(config.smt2):
-        common.eprint(("error: failed to generate SMT-LIB formula. "
-                       "Please report this issue."))
+        common.eprint("error: failed to generate SMT-LIB formula. ")
         sys.exit(1)
 
     if config.ovars and common.is_file_empty(config.ovars):
