@@ -233,16 +233,16 @@ def smtlib_bv_to_python_int(value):
 UNSAT = -1
 UNKNOWN = 0
 SAT = 1
-MODEL = 2
+OPTIMAL = 2
 
-def print_search_status(config, status, models, oskeleton):
+def print_search_status(config, status, models, oskeleton, is_opt_problem):
     """Prints the search status in a format
     compatible with FlatZinc."""
     switch = {
         UNSAT   : "=====UNSATISFIABLE=====",
         UNKNOWN : "=====UNKNOWN=====",
-        SAT     : "==========",
-        MODEL   : "----------",
+        SAT     : "----------",
+        OPTIMAL : "==========",
     }
     if status in [UNSAT, UNKNOWN]:
         print(switch[status])
@@ -255,10 +255,14 @@ def print_search_status(config, status, models, oskeleton):
         for model in models:
             model = {**model, **autocomplete}
             print_model(config, model, oskeleton)
-            print(switch[MODEL])
+            print(switch[status])
+            if is_opt_problem:
+                print(switch[OPTIMAL])
 
         if not models:
             print(switch[status])
+            if is_opt_problem:
+                print(switch[OPTIMAL])
 
 def print_model(config, model, oskeleton):
     """Prints a model in FlatZic format."""

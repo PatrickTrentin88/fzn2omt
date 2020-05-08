@@ -96,7 +96,9 @@ def cvc4_solve(config, solver_config=None):
         # 6. extract model(s)
         models = cvc4_extract_models(output_trace)
 
-        common.print_search_status(config, status, models, oskeleton)
+        # 7. print status + model(s)
+        is_opt_problem = False  # NB: CVC4 cannot optimize!
+        common.print_search_status(config, status, models, oskeleton, is_opt_problem)
 
 
 def cvc4_solve_cmdline_args(config):

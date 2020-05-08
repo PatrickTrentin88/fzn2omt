@@ -91,7 +91,9 @@ def zthree_solve(config, solver_config=None):
         # 6. extract model(s)
         models = zthree_extract_models(output_trace)
 
-        common.print_search_status(config, status, models, oskeleton)
+        # 7. print status + model(s)
+        is_opt_problem = common.is_optimization_problem(config.model)
+        common.print_search_status(config, status, models, oskeleton, is_opt_problem)
 
 
 def zthree_solve_cmdline_args(config):
