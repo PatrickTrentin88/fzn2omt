@@ -251,12 +251,10 @@ def make_smtlib_compatible_with_cvc4(config, optimathsat_config): # pylint: disa
                 elif common.match_check_sat(line):
                     continue
                 else:
-                    line = line.replace(b'|', b'_@_')
-                    line = line.replace(b':', b'_@@_')
-                    line = line.replace(b' .', b' _private_')
                     if config.bv_enc:
                         line = line.replace(b'_ to_bv ', b'_ int2bv ')
-                        # TODO: handle sbv_to_int
+                        line = common.replace_sbv_to_int(config, line)
+                    line = line.replace(b' .', b' _private_')
                     out_f.write(line.decode("utf-8"))
 
             # footer

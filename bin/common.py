@@ -2,8 +2,7 @@
 #!python
 
 """
-A compact library of common functions shared by
-the various executables.
+A library of common functions shared by the various executables.
 """
 
 import argparse
@@ -108,6 +107,58 @@ def match_objective(bline):
         obj.bv_width = 0
         match = obj
     return match
+
+def replace_sbv_to_int(config, bline):
+    """Matches (sbv_to_int <term>) in the
+    given argument and replaces with a
+    SMT-LIB compatible encoding"""
+    assert config.bv_enc
+
+    regex_sbv = re.compile(br"\(sbv_to_int ([\w\_\-.]*?)\)")
+
+    while True:
+
+        match = re.search(regex_sbv, bline)
+        if not match:
+            break
+
+        bv_var = match.group(1)
+        bv_width = extract_bv_var_width(config, bv_var)
+
+        var = bv_var.decode("utf-8")
+        msb = bv_width - 1
+        dsp = 2 ** bv_width
+        expr = (f"(ite (= ((_ extract {msb} {msb}) {var}) #b0) "
+                f"     (bv2nat {var}) "
+                f"     (- (bv2nat {var}) {dsp}))")
+
+        bline = bline.replace(b"(sbv_to_int %b)" % bv_var,
+                              expr.encode("utf-8"))
+
+    return bline
+
+
+def extract_bv_var_width(config, bv_var):
+    """Extracts and returns the width of a BitVec variable
+    `bv_var` from the SMT-LIB formula in `config.smt2`"""
+    assert config.bv_enc
+    assert not is_file_empty(config.smt2)
+
+    width = -1
+    with io.open(config.smt2, 'rt') as in_f:
+        formula = mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ)
+
+        regex_decl = re.compile((br"\((?:define|declare)-fun +%b +"
+                                 br"\(\) \(_ BitVec ([0-9]+)\)") % bv_var)
+
+        match = re.search(regex_decl, formula)
+        if match:
+            width = int(match.group(1))
+        else:
+            raise Exception(("error: failed to determine "
+                             "BitVec width of `{}`").format(bv_var.decode("utf-8")))
+
+    return width
 
 
 ###################
