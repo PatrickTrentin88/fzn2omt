@@ -210,7 +210,8 @@ def make_smtlib_compatible_with_optimathsat(config, solver_config):
 def optimathsat_parse_cmdline_options():
     """parses and returns input parameters."""
     parser = argparse.ArgumentParser(description=("A tool for solving FlatZinc "
-                                                  "problems with OptiMathSAT."))
+                                                  "problems with OptiMathSAT."),
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     main_group = parser.add_argument_group("Main Options")
 

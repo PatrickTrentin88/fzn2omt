@@ -288,7 +288,8 @@ def cvc4_objective_to_str(config, obj):
 def cvc4_parse_cmdline_options():
     """parses and returns input parameters."""
     parser = argparse.ArgumentParser(description=("A tool for solving FlatZinc "
-                                                  "problems with CVC4."))
+                                                  "problems with CVC4."),
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     main_group = parser.add_argument_group("Main Options")
 

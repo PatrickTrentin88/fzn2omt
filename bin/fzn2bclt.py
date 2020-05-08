@@ -288,7 +288,8 @@ def barcelogic_objective_to_str(config, obj):
 def barcelogic_parse_cmdline_options():
     """parses and returns input parameters."""
     parser = argparse.ArgumentParser(description=("A tool for solving FlatZinc "
-                                                  "problems with Barcelogic."))
+                                                  "problems with Barcelogic."),
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     main_group = parser.add_argument_group("Main Options")
 

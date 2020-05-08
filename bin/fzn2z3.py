@@ -300,7 +300,8 @@ def zthree_nira_objective_to_str(obj):
 def zthree_parse_cmdline_options():
     """parses and returns input parameters."""
     parser = argparse.ArgumentParser(description=("A tool for solving FlatZinc "
-                                                  "problems with Z3."))
+                                                  "problems with Z3."),
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     main_group = parser.add_argument_group("Main Options")
 
