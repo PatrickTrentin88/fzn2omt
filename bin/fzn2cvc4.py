@@ -84,9 +84,11 @@ def cvc4_solve(config, solver_config=None):
             result = subprocess.run(args, text=True, stderr=subprocess.PIPE,
                                     stdout=out_f)
 
-        # 4. display any error
-        if result.stderr:
-            print(result.stderr, file=sys.stderr, end='')
+            # 4. display any error
+            if result.returncode:
+                with open(output_trace, "r") as in_f:
+                    print(in_f.read(), file=sys.stderr, end='')
+                sys.exit(1)
 
         # 5. extract status
         status = cvc4_extract_search_status(output_trace)

@@ -62,6 +62,7 @@ def zthree_solve(config, solver_config=None):
         config.smt2 = os.path.join(tmp_dir, "formula.smt2")
         config.ovars = os.path.join(tmp_dir, "output_vars.txt")
         output_trace = os.path.join(tmp_dir, "trace.out")
+        config.get_model = False
 
         # 1. generate SMT-LIB + OVARS files
         zthree_compile(config)
@@ -78,9 +79,11 @@ def zthree_solve(config, solver_config=None):
             result = subprocess.run(args, text=True, stderr=subprocess.PIPE,
                                     stdout=out_f)
 
-        # 4. display any error
-        if result.stderr:
-            print(result.stderr, file=sys.stderr, end='')
+            # 4. display any error
+            if result.returncode:
+                with open(output_trace, "r") as in_f:
+                    print(in_f.read(), file=sys.stderr, end='')
+                sys.exit(1)
 
         # 5. extract status
         status = zthree_extract_search_status(output_trace)
@@ -97,7 +100,8 @@ def zthree_solve_cmdline_args(config):
 
     args = [binary_filename(),
             config.smt2,
-            "model.completion=true"]
+            "model.completion=true",
+            "dump_models=true"]
 
     return args
 
@@ -238,7 +242,7 @@ def make_smtlib_compatible_with_zthree(config, optimathsat_config): # pylint: di
                 else:
                     if config.bv_enc:
                         line = line.replace(b'_ to_bv ', b'_ int2bv ')
-                        line = line.replace(b'sbv_to_int', b'bv2int')
+#                        line = line.replace(b'sbv_to_int', b'bv2int')
                     out_f.write(line.decode("utf-8"))
 
             # footer
@@ -246,9 +250,13 @@ def make_smtlib_compatible_with_zthree(config, optimathsat_config): # pylint: di
                 for line in zthree_objective_to_str(config, obj):
                     out_f.write(line)
             out_f.write("(check-sat)\n")
+
             if objectives:
                 out_f.write("(get-objectives)\n")
-            out_f.write("(get-model)\n")
+
+            if config.get_model:
+                out_f.write("(get-model)\n")
+
             out_f.write("(exit)\n")
 
     # overwrite raw SMT-LIB file with OptiMathSAT-specific file
@@ -373,6 +381,7 @@ def zthree_parse_cmdline_options():
     config, solver_config = parser.parse_known_args()
 
     config.int_enc = not config.bv_enc
+    config.get_model = True
 
     if config.finite_precision and \
             config.finite_precision >= 2:
