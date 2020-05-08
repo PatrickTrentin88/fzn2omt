@@ -114,10 +114,24 @@ def optimathsat_compile(config, solver_config=None):
         print(result.stdout, end='')
         if result.stderr:
             print(result.stderr, end='')
-        raise Exception("fzn_optimathsat.py: compilation failed")
+        common.eprint(("error: failed to generate SMT-LIB formula. "
+                       "Please report this issue."))
+        sys.exit(1)
+
+    if common.is_file_empty(config.smt2):
+        common.eprint(("error: failed to generate SMT-LIB formula. "
+                       "Please report this issue."))
+        sys.exit(1)
+
+    if config.ovars and common.is_file_empty(config.ovars):
+        common.eprint(("error: failed to generate mapping between "
+                       "SMT-LIB and FlatZinc output variables. "
+                       "Please report this issue."))
+        sys.exit(1)
 
     if not config.compile_raw:
         make_smtlib_compatible_with_optimathsat(config, solver_config)
+
 
 def optimathsat_compile_cmdline_args(config):
     """Determines the command-line arguments for the optimathsat call."""
@@ -144,9 +158,6 @@ def optimathsat_compile_cmdline_args(config):
 
 def make_smtlib_compatible_with_optimathsat(config, solver_config):
     """Modifies SMT-LIB file with OptiMathSAT-specific syntax."""
-    if common.is_file_empty(config.smt2):
-        return
-
     tmp_file_name = None
 
     with io.open(config.smt2, 'rt') as in_f:

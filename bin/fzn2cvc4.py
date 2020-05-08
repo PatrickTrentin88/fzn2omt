@@ -202,9 +202,6 @@ def cvc4_compile(config):
 
 def make_smtlib_compatible_with_cvc4(config, optimathsat_config): # pylint: disable=R0912
     """Modifies SMT-LIB file with CVC4-specific syntax."""
-    if common.is_file_empty(config.smt2):
-        return
-
     tmp_file_name = None
 
     with io.open(config.smt2, 'rt') as in_f:

@@ -466,44 +466,44 @@ def extract_solution_skeleton(ovars_file): # pylint: disable=R0914
     """Extracts the required solution skeleton,
     and also the mapping between FlatZinc and
     SMT-LIB variables."""
+    assert not is_file_empty(ovars_file)
     ret = []
 
     regex_bsc = re.compile(r"% (.*) = (.*);")
     regex_arr = re.compile(r"array(.*)d\((.*) (\[.*\])\)")
     regex_raw = re.compile(r"\{.+?\}|[^, \[\]]+")
 
-    if not is_file_empty(ovars_file):
-        with io.open(ovars_file, 'rt') as in_f:
-            skeleton = mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ)
+    with io.open(ovars_file, 'rt') as in_f:
+        skeleton = mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ)
 
-            # skip first line
-            skeleton.readline()
+        # skip first line
+        skeleton.readline()
 
-            for line in iter(skeleton.readline, b""):
-                line = line.decode("utf-8")
+        for line in iter(skeleton.readline, b""):
+            line = line.decode("utf-8")
 
-                out = argparse.Namespace()
+            out = argparse.Namespace()
 
-                # extract 'var = expr'
-                out.decl, expr = re.match(regex_bsc, line).groups()
+            # extract 'var = expr'
+            out.decl, expr = re.match(regex_bsc, line).groups()
 
-                # extract array(..., [])
-                match = re.match(regex_arr, expr)
-                if match:
-                    dim, decl, raw_arr = match.groups()
-                    out.str = partial("{0} = array{1}d({2} {3});".format,
-                                      out.decl, dim, decl)
-                    out.term = []
+            # extract array(..., [])
+            match = re.match(regex_arr, expr)
+            if match:
+                dim, decl, raw_arr = match.groups()
+                out.str = partial("{0} = array{1}d({2} {3});".format,
+                                  out.decl, dim, decl)
+                out.term = []
 
-                    terms = re.findall(regex_raw, raw_arr)
-                    for term in terms:
-                        out.term.append(skeleton_term_to_python(term))
+                terms = re.findall(regex_raw, raw_arr)
+                for term in terms:
+                    out.term.append(skeleton_term_to_python(term))
 
-                else:
-                    out.str = partial("{0} = {1};".format, out.decl)
-                    out.term = skeleton_term_to_python(expr)
+            else:
+                out.str = partial("{0} = {1};".format, out.decl)
+                out.term = skeleton_term_to_python(expr)
 
-                ret.append(out)
+            ret.append(out)
 
     return ret
 
