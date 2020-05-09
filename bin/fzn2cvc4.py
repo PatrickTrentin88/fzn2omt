@@ -190,6 +190,7 @@ def cvc4_compile(config):
     assert config.smt2
 
     optimathsat_config = argparse.Namespace(**vars(config))
+    optimathsat_config.infinite_precision = True
     optimathsat_config.compile_raw = True
 
     if not hasattr(optimathsat_config, 'ovars'):
@@ -349,7 +350,7 @@ def cvc4_parse_cmdline_options():
                                    "as finite precision decimals using the specified "
                                    "precision level. Must be larger or equal 2."),
                              action=common.check_finite_precision(),
-                             metavar="prec", type=int, default=None)
+                             metavar="prec", type=int, default=32)
 
     ###################
     # IGNORED config #

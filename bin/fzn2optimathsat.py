@@ -81,7 +81,7 @@ def optimathsat_solve_cmdline_args(config):
             "-opt.fzn.all_solutions={}".format(config.all_solutions_opt),
             "-opt.fzn.partial_solutions={}".format(config.partial_solutions)]
 
-    if config.finite_precision:
+    if not config.infinite_precision:
         args.append("-opt.fzn.finite_precision_model=True")
         args.append("-opt.fzn.finite_precision={}".format(config.finite_precision))
 
@@ -302,12 +302,16 @@ def optimathsat_parse_cmdline_options():
 
     # opt.fzn.finite_precision_model (false)
     # opt.fzn.finite_precision (32)
+    model_group.add_argument("--infinite-precision",
+                             help=("Print infinite-precision rational numbers "
+                                   "as fractions. Overrides --finite-precision."),
+                             action="store_true", default=False)
     model_group.add_argument("--finite-precision",
                              help=("Print infinite-precision rational numbers "
                                    "as finite precision decimals using the specified "
                                    "precision level. Must be larger or equal 2."),
                              action=common.check_finite_precision(),
-                             metavar="prec", type=int, default=None)
+                             metavar="prec", type=int, default=32)
 
     ###################
     # IGNORED config #
