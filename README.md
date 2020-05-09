@@ -93,7 +93,7 @@ Linux users can also edit and source the contents of the `.bashrc`
 file distributed with this project.
 
 
-# [OptiMathSAT](http://optimathsat.disi.unitn.it/)
+# Solving with [OptiMathSAT](http://optimathsat.disi.unitn.it/): fzn2optimathsat.py
 
 The option to set the desired multi-objective optimization is:
 
@@ -118,13 +118,13 @@ prints a warning message with the exact optimal value:
     ----------
     ==========
 
-## examples
+### [OptiMathSAT](http://optimathsat.disi.unitn.it/) examples
 
 - compilation:
 
-    ~$ fzn2optimathsat.py examples/coloring.fzn --smt2 coloring.smt2
-    ~$ ls
-    coloring.smt2
+      ~$ fzn2optimathsat.py examples/coloring.fzn --smt2 coloring.smt2
+      ~$ ls
+      coloring.smt2
 
 - solving:
 
@@ -213,7 +213,7 @@ prints a warning message with the exact optimal value:
       ==========
 
 
-# [z3](https://github.com/Z3Prover/z3)
+# Solving with [Z3](https://github.com/Z3Prover/z3): fzn2z3.py
 
 The option to set the desired multi-objective optimization is:
 
@@ -235,26 +235,26 @@ to `K +/- epsilon` for some `K` and some arbitrarily small
     ----------
     ==========
 
-## examples
+### [z3](https://github.com/Z3Prover/z3) examples
 
 - compilation:
 
-    ~$ fzn2z3.py examples/coloring.fzn --smt2 coloring.smt2
-    ~$ ls
-    coloring.smt2
+      ~$ fzn2z3.py examples/coloring.fzn --smt2 coloring.smt2
+      ~$ ls
+      coloring.smt2
 
 - solving:
 
-    ~$ fzn2z3.py examples/warehouses.fzn
-    total = 383;
-    supplier = array1d(1..10, [5, 2, 5, 1, 5, 2, 2, 3, 2, 3]);
-    open = array1d(1..5, [true, true, true, false, true]);
-    cost = array1d(1..10, [30, 27, 70, 2, 4, 22, 5, 13, 35, 55]);
-    ----------
-    ==========
+      ~$ fzn2z3.py examples/warehouses.fzn
+      total = 383;
+      supplier = array1d(1..10, [5, 2, 5, 1, 5, 2, 2, 3, 2, 3]);
+      open = array1d(1..5, [true, true, true, false, true]);
+      cost = array1d(1..10, [30, 27, 70, 2, 4, 22, 5, 13, 35, 55]);
+      ----------
+      ==========
 
 
-# [Barcelogic](https://barcelogic.com/)
+# Solving with [Barcelogic](https://barcelogic.com/): fzn2bclt.py
 
 Some FlatZinc problems require an encoding based on OMT(NIRA),
 which is not supported by [Barcelogic](https://barcelogic.com/).
@@ -268,28 +268,28 @@ the default search interval is [-1000000000,1000000000]. Setting
 an inappropriate search interval may cause [Barcelogic](https://barcelogic.com/)
 to provide the incorrect answer (e.g. `unsat` or the wrong optimal value).
 
-## examples
+### [Barcelogic](https://barcelogic.com/) examples
 
 - compilation:
 
-    ~$ fzn2bclt.py examples/coloring.fzn --smt2 coloring.smt2
-    ~$ ls
-    coloring.smt2
+      ~$ fzn2bclt.py examples/coloring.fzn --smt2 coloring.smt2
+      ~$ ls
+      coloring.smt2
 
 - solving:
 
-    ~$ fzn2bclt.py examples/warehouses.fzn
-    total = 383;
-    supplier = array1d(1..10, [5, 2, 5, 1, 5, 2, 2, 3, 2, 3]);
-    open = array1d(1..5, [true, true, true, false, true]);
-    cost = array1d(1..10, [30, 27, 70, 2, 4, 22, 5, 13, 35, 55]);
-    ----------
-    ==========
+      ~$ fzn2bclt.py examples/warehouses.fzn
+      total = 383;
+      supplier = array1d(1..10, [5, 2, 5, 1, 5, 2, 2, 3, 2, 3]);
+      open = array1d(1..5, [true, true, true, false, true]);
+      cost = array1d(1..10, [30, 27, 70, 2, 4, 22, 5, 13, 35, 55]);
+      ----------
+      ==========
 
 
-# [CVC4](https://cvc4.github.io/)
+# Solving with [CVC4](https://cvc4.github.io/): fzn2cvc4.py
 
-CVC4 is a SMT solver and does not support optimization.
+[CVC4](https://cvc4.github.io/) is a SMT solver and does not support optimization.
 
 Normally, attempting to solve an optimization problem with CVC4
 results in an error message.
@@ -297,7 +297,7 @@ results in an error message.
     ~$ fzn2cvc4.py examples/unit_tests/opt.fzn
     error: objectives are not supported
 
-It is possible to force CVC4 to solve the input problem
+It is possible to force [CVC4](https://cvc4.github.io/) to solve the input problem
 by ignoring the objective function. Naturally, the resulting
 model is not guaranteed to be optimal.
 
@@ -305,25 +305,20 @@ model is not guaranteed to be optimal.
     objective = 0;
     ----------
 
-## examples
+### [CVC4](https://cvc4.github.io/) examples
 
 - compilation:
 
-    ~$ fzn2z3.py examples/coloring.fzn --smt2 coloring.smt2
-    ~$ ls
-    coloring.smt2
+      ~$ fzn2z3.py examples/coloring.fzn --smt2 coloring.smt2
+      ~$ ls
+      coloring.smt2
 
 - solving:
 
-    ~$ fzn2z3.py examples/coloring.fzn
-    numColors = 4;
-    x = array1d(1..6, [1, 1, 2, 3, 4, 4]);
-    ----------
-
-
-
-
-## 
+      ~$ fzn2z3.py examples/coloring.fzn
+      numColors = 4;
+      x = array1d(1..6, [1, 1, 2, 3, 4, 4]);
+      ----------
 
 
 # NOTES
