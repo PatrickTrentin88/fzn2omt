@@ -1,0 +1,3 @@
+array [1..3] of var 0..1: a ::output_array([1..3]);
+constraint optimathsat_all_different_int(a);
+solve satisfy;

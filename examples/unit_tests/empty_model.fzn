@@ -1,0 +1,2 @@
+var int: x;
+solve satisfy;

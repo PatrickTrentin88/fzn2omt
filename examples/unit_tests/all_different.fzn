@@ -1,0 +1,12 @@
+%
+% NOTE(S):
+% 1. see website of OptiMathSAT for info about
+%    supported global constraints.
+% 2. global constraints are not supported when
+%    --bv-enc is enabled.
+%
+
+array [1..10] of var 1..10: x ::output_array([1..10]);
+constraint optimathsat_all_different_int(x);
+constraint optimathsat_increasing_int(x);
+solve satisfy;
