@@ -19,12 +19,20 @@ compiler for
 # Functionality
 
 - All tools support the encoding based on the `QF_LIRA` logic
-  (option `--int-enc`).
+  (option `--int-enc`), that may sometimes be extended to `QF_NIRA`
+  when the input problem requires it.
   [OptiMathSAT](http://optimathsat.disi.unitn.it/),
   [z3](https://github.com/Z3Prover/z3) and
   [CVC4](https://cvc4.github.io/) support also the encoding
   based on the `QF_BV` logic (option `--bv-enc`).
 
+- [OptiMathSAT](http://optimathsat.disi.unitn.it/) has some
+  [limited support for Global Constraints](http://optimathsat.disi.unitn.it/pages/fznreference.html),
+  when the Bit-Vector encoding is not used (option `--bv-enc`).
+  Until conclusive experimental evidence of their effectiveness
+  has been collected on a wide set of benchmarks, the maintainers
+  of [OptiMathSAT](http://optimathsat.disi.unitn.it/) do not
+  recommend using them.
 
 - Both [OptiMathSAT](http://optimathsat.disi.unitn.it/) and
   [z3](https://github.com/Z3Prover/z3)
@@ -46,10 +54,20 @@ compiler for
   with [OptiMathSAT](http://optimathsat.disi.unitn.it/) and
   [z3](https://github.com/Z3Prover/z3), look at the examples below.
 
+- [Barcelogic](https://barcelogic.com/) does not have native support
+  for multi-objective optimization. Thus, multiple optimization targets
+  are solved incrementally.
+
+
+# REQUIREMENTS
+
+The scripts require
+
+- `Python 3.7` or superior
+-  [OptiMathSAT](http://optimathsat.disi.unitn.it/) `1.7.0` or superior
+
 
 # INSTALLATION
-
-The scripts require `Python 3.7` or superior.
 
 To install the scripts, add the current directory
 to the `PATH` environment variable:
@@ -62,7 +80,7 @@ It is also necessary to add the binaries of
 [z3](https://github.com/Z3Prover/z3) and
 [CVC4](https://cvc4.github.io/)
 to the `PATH` environment variable.
-
+)
 Notice that the conversion from **FlatZinc** to **SMT-LIB** (v. 2)
 uses the `fzn2omt` interface of [OptiMathSAT](http://optimathsat.disi.unitn.it/),
 so this tool is required even when solving the problems
@@ -71,148 +89,11 @@ with the other tools.
 To make these changes permanent, please consider editing the
 `~/.bashrc` file.
 
-
-# USAGE
-
-Options that are not captured by the scripts are handed
-to the underlying OMT solver.
-
-## fzn2smt2
-
-    ~$ fzn2smt2.py -h
-    usage: fzn2smt2.py [-h] [--smt2 <file>.smt2] [--solver {bclt,optimathsat,z3}]
-                       [--bv-enc | --int-enc] [--cardinality-networks]
-                       [--bv-alldifferent] [--bclt-lower BCLT_LOWER]
-                       [--bclt-upper BCLT_UPPER]
-                       <model>.fzn
-    
-    A FlatZinc compiler to SMT-LIBv2 with OMT extensions.
-    
-    optional arguments:
-      -h, --help            show this help message and exit
-    
-    Main Options:
-      <model>.fzn           The FlatZinc model
-      --smt2 <file>.smt2    Filename for the generated SMT-LIB output
-      --solver {bclt,cvc4,optimathsat,z3}
-                            The SMT-LIB output must be compatible with the target
-                            OMT solver.
-    
-    Encoding Options:
-      --bv-enc              Encode ints with the SMT-LIB Bit-Vector type.
-      --int-enc             Encode ints with the SMT-LIB Int type.
-      --cardinality-networks
-                            Enable cardinality networks (when applicable).
-      --bv-alldifferent     all-different constraints encoded with Bit-Vectors.
-      --bclt-lower BCLT_LOWER
-                            Set the default lower-bound for any objective when
-                            using the bclt solver.
-      --bclt-upper BCLT_UPPER
-                            Set the default upper-bound for any objective when
-                            using the bclt solver
-
-## fzn2bclt.py
-
-    ~$ fzn2bclt.py -h
-    usage: fzn2bclt.py [-h] [--success] [--cardinality-networks]
-                       [--bclt-lower BCLT_LOWER] [--bclt-upper BCLT_UPPER]
-                       <model>.fzn
-    
-    A tool for solving FlatZinc problems with bclt.
-    
-    optional arguments:
-      -h, --help            show this help message and exit
-    
-    Main Options:
-      <model>.fzn           The FlatZinc model
-      --success             Print success as response to commands
-    
-    Encoding Options:
-      --cardinality-networks
-                            Enable cardinality networks (when applicable).
-      --bclt-lower BCLT_LOWER
-                            Set the default lower-bound for any objective when
-                            using the bclt solver.
-      --bclt-upper BCLT_UPPER
-                            Set the default upper-bound for any objective when
-                            using the bclt solver
-
-## fzn2cvc4.py
-
-    ~$ fzn2cvc4.py -h
-    usage: fzn2cvc4.py [-h] [--bv-enc | --int-enc] [--cardinality-networks]
-                       [--bv-alldifferent]
-                       <model>.fzn
-    
-    A tool for solving FlatZinc problems with cvc4.
-    
-    optional arguments:
-      -h, --help            show this help message and exit
-    
-    Main Options:
-      <model>.fzn           The FlatZinc model
-    
-    Encoding Options:
-      --bv-enc              Encode ints with the SMT-LIB Bit-Vector type.
-      --int-enc             Encode ints with the SMT-LIB Int type.
-      --cardinality-networks
-                            Enable cardinality networks (when applicable).
-      --bv-alldifferent     all-different constraints encoded with Bit-Vectors.
+Linux users can also edit and source the contents of the `.bashrc`
+file distributed with this project.
 
 
-## fzn2optimathsat.py
-
-    ~$ fzn2optimathsat.py -h
-    usage: fzn2optimathsat.py [-h] [--smt2 <file>.smt2] [--compile-only]
-                              [--bv-enc | --int-enc] [--cardinality-networks]
-                              [--bv-alldifferent] [--random-seed N]
-                              [--experimental-non-linear] [--partial-solutions]
-                              [--all-solutions-opt] [--all-solutions]
-                              [--max-solutions N] [--finite-precision prec]
-                              [--free-search] [--num-threads N]
-                              <model>.fzn
-    
-    A simple wrapper around OptiMathSAT.
-    
-    positional arguments:
-      <model>.fzn           The FlatZinc model
-    
-    optional arguments:
-      -h, --help            show this help message and exit
-      --smt2 <file>.smt2, --output-smt2-to-file <file>.smt2
-                            Filename for the generated SMT-LIB output
-      --compile-only        Compile only (do not run solver).
-      --bv-enc              Encode ints with the SMT-LIB Bit-Vector type.
-      --int-enc             Encode ints with the SMT-LIB Int type.
-      --cardinality-networks
-                            Enable cardinality networks (when applicable).
-      --bv-alldifferent     all-different constraints encoded with Bit-Vectors.
-      --random-seed N, -r N
-                            Set seed for pseudo-random number generators.
-      --experimental-non-linear, -e
-                            Activates experimental non-linear support. Enabling
-                            this option can negatively impact the performance.
-      --partial-solutions   Print any sub-optimal solution satisfying the input
-                            model.
-      --all-solutions-opt   Print all solutions of the input problem. If this is
-                            an optimization problem, it prints all solutions with
-                            the same optimal value.
-      --all-solutions, -a   Print all solutions of the input problem. With
-                            satisfaction problems, it enables '--all-solutions-
-                            opt'. With optimization problems, it enables '--
-                            partial-solutions'.
-      --max-solutions N, -n N
-                            Maximum number of solutions printed.
-      --finite-precision prec
-                            Print infinite-precision rational numbers as finite
-                            precision decimals using the specified precision
-                            level. Must be larger or equal 2.
-      --free-search, -f     No need to follow search specification. (OptiMathSAT
-                            always ignores all search specifications)
-      --num-threads N, -p N
-                            Number of threads. (OptiMathSAT can use only one
-                            thread)
-
+# [OptiMathSAT](http://optimathsat.disi.unitn.it/)
 
 The option to set the desired multi-objective optimization is:
 
@@ -223,53 +104,29 @@ The option to set the desired multi-objective optimization is:
      ~$ fzn2optimathsat.py <model.fzn> -opt.priority=par
      ...
 
-## fzn2z3.py
+[OptiMathSAT](http://optimathsat.disi.unitn.it/) may print a
+sub-optimal model when the objective function is unbounded or,
+according to its infinite-precision arithmetic engine, equal
+to `K +/- epsilon` for some `K` and some arbitrarily small
+`epsilon`. In such cases, [OptiMathSAT](http://optimathsat.disi.unitn.it/)
+prints a warning message with the exact optimal value:
 
-    ~$ fzn2z3.py -h
-    usage: fzn2z3.py [-h] [--bv-enc | --int-enc] [--cardinality-networks]
-                     [--bv-alldifferent]
-                     <model>.fzn
-    
-    A tool for solving FlatZinc problems with z3.
-    
-    optional arguments:
-      -h, --help            show this help message and exit
-    
-    Main Options:
-      <model>.fzn           The FlatZinc model
-    
-    Encoding Options:
-      --bv-enc              Encode ints with the SMT-LIB Bit-Vector type.
-      --int-enc             Encode ints with the SMT-LIB Int type.
-      --cardinality-networks
-                            Enable cardinality networks (when applicable).
-      --bv-alldifferent     all-different constraints encoded with Bit-Vectors.
+    ~$ fzn2optimathsat.py examples/unit_tests/unbounded.fzn
+    % objective: x (optimal model)
+    % warning: x is unbounded: (- oo)
+    x = -1000000000;
+    ----------
+    ==========
 
-The option to set the desired multi-objective optimization is:
+## examples
 
-    opt.priority=[box|lex|par]
-    
-**e.g.**
+- compilation:
 
-     ~$ fzn2z3.py <model.fzn> opt.priority=par
-     ...
+    ~$ fzn2optimathsat.py examples/coloring.fzn --smt2 coloring.smt2
+    ~$ ls
+    coloring.smt2
 
-
-# EXAMPLES
-
-These examples require [OptiMathSAT](http://optimathsat.disi.unitn.it/)
-version `1.6.2` or superior.
-
-    # -c    : compile only
-    # --fzn : target FlatZinc model
-    ~$ minizinc -c --fzn examples/warehouses.fzn examples/warehouses.mzn
-
-## Example #01: Solving with [OptiMathSAT](http://optimathsat.disi.unitn.it/)
-
-**Note:** only [OptiMathSAT](http://optimathsat.disi.unitn.it/) can print
-the model in a `DZN`-friendly format.
-
-- simple example:
+- solving:
 
       ~$ fzn2optimathsat.py examples/warehouses.fzn
       % objective: total (optimal model)
@@ -356,74 +213,117 @@ the model in a `DZN`-friendly format.
       ==========
 
 
-## Example #02: Solving with [Barcelogic](https://barcelogic.com/)
+# [z3](https://github.com/Z3Prover/z3)
 
-    ~$ fzn2bclt.py examples/warehouses.fzn
-    (optimal 383)
-    (
-     ( define-fun X_INTRODUCED_0_ ( ) Int 5 )
-     ( define-fun X_INTRODUCED_1_ ( ) Int 2 )
-     ( define-fun X_INTRODUCED_2_ ( ) Int 5 )
+The option to set the desired multi-objective optimization is:
+
+    opt.priority=[box|lex|par]
+    
+**e.g.**
+
+     ~$ fzn2z3.py <model.fzn> opt.priority=par
      ...
-     ( define-fun X_INTRODUCED_174_ ( ) Int 0 )
-     ( define-fun X_INTRODUCED_175_ ( ) Bool false )
-     ( define-fun X_INTRODUCED_176_ ( ) Int 0 )
-    )
 
-**Note:** [Barcelogic](https://barcelogic.com/) handles only
-minimization objectives, so the actual goal of a maximization
-problem is replaced with the minimization of the opposite
-target. When this happens, the value printed in the first line
-of the output is not the optimal value of the original objective
-function.
+[z3](https://github.com/Z3Prover/z3) may print a
+sub-optimal model when the objective function is unbounded or,
+according to its infinite-precision arithmetic engine, equal
+to `K +/- epsilon` for some `K` and some arbitrarily small
+`epsilon`. 
 
-## Example #03: Solving with [z3](https://github.com/Z3Prover/z3)
+    ~$ fzn2z3.py examples/unit_tests/unbounded.fzn
+    x = 0;
+    ----------
+    ==========
+
+## examples
+
+- compilation:
+
+    ~$ fzn2z3.py examples/coloring.fzn --smt2 coloring.smt2
+    ~$ ls
+    coloring.smt2
+
+- solving:
 
     ~$ fzn2z3.py examples/warehouses.fzn
-    sat
-    (objectives
-     (total 383)
-    )
-    (model 
-      (define-fun X_INTRODUCED_173_ () Bool
-        false)
-      (define-fun X_INTRODUCED_76_ () Bool
-        false)
-      (define-fun X_INTRODUCED_13_ () Bool
-        false)
-      ...
-      (define-fun X_INTRODUCED_87_ () Int
-        4)
-      (define-fun X_INTRODUCED_63_ () Int
-        1)
-      (define-fun X_INTRODUCED_15_ () Int
-        30)
-    )
-    
-**Note:** when using the **SMT-LIB** encoding based on the `QF_BV`
-Logic, [z3](https://github.com/Z3Prover/z3) can handle only maximization
-targets. Therefore, the actual minimization goal is replaced with a
-custom maximization objective that forces the minimization of the
-original goal. When this happens, the value printed in the first lines
-of the output is not the optimal value of the original objective function.
+    total = 383;
+    supplier = array1d(1..10, [5, 2, 5, 1, 5, 2, 2, 3, 2, 3]);
+    open = array1d(1..5, [true, true, true, false, true]);
+    cost = array1d(1..10, [30, 27, 70, 2, 4, 22, 5, 13, 35, 55]);
+    ----------
+    ==========
 
-## Example #04: Solving with [CVC4](https://cvc4.github.io/)
 
-    ~$ fzn2cvc4.py examples/coloring.fzn
-    sat
-    (model
-    (define-fun numColors () Int 4)
-    (define-fun X_INTRODUCED_0_ () Int 1)
-    (define-fun X_INTRODUCED_1_ () Int 1)
-    (define-fun X_INTRODUCED_2_ () Int 2)
-    (define-fun X_INTRODUCED_3_ () Int 3)
-    (define-fun X_INTRODUCED_4_ () Int 4)
-    (define-fun X_INTRODUCED_5_ () Int 4)
-    )
+# [Barcelogic](https://barcelogic.com/)
 
-**Note:** when dealing with FlatZinc models with an optimization goal,
-the FlatZinc model is compiled to SMT-LIB without the optimization
-goal because [CVC4](https://cvc4.github.io/) does not support it.
+Some FlatZinc problems require an encoding based on OMT(NIRA),
+which is not supported by [Barcelogic](https://barcelogic.com/).
+For such problems, [Barcelogic](https://barcelogic.com/) may
+incorrectly return `unsat`.
+
+[Barcelogic](https://barcelogic.com/) requires objective functions
+to have a known, and finite, domain. When lower/upper bounds are
+not provided manually (options `--bclt-lower` and `--bclt-upper`),
+the default search interval is [-1000000000,1000000000]. Setting
+an inappropriate search interval may cause [Barcelogic](https://barcelogic.com/)
+to provide the incorrect answer (e.g. `unsat` or the wrong optimal value).
+
+## examples
+
+- compilation:
+
+    ~$ fzn2bclt.py examples/coloring.fzn --smt2 coloring.smt2
+    ~$ ls
+    coloring.smt2
+
+- solving:
+
+    ~$ fzn2bclt.py examples/warehouses.fzn
+    total = 383;
+    supplier = array1d(1..10, [5, 2, 5, 1, 5, 2, 2, 3, 2, 3]);
+    open = array1d(1..5, [true, true, true, false, true]);
+    cost = array1d(1..10, [30, 27, 70, 2, 4, 22, 5, 13, 35, 55]);
+    ----------
+    ==========
+
+
+# [CVC4](https://cvc4.github.io/)
+
+CVC4 is a SMT solver and does not support optimization.
+
+Normally, attempting to solve an optimization problem with CVC4
+results in an error message.
+
+    ~$ fzn2cvc4.py examples/unit_tests/opt.fzn
+    error: objectives are not supported
+
+It is possible to force CVC4 to solve the input problem
+by ignoring the objective function. Naturally, the resulting
+model is not guaranteed to be optimal.
+
+    ~$ fzn2cvc4.py examples/unit_tests/opt.fzn --ignore-objs
+    objective = 0;
+    ----------
+
+## examples
+
+- compilation:
+
+    ~$ fzn2z3.py examples/coloring.fzn --smt2 coloring.smt2
+    ~$ ls
+    coloring.smt2
+
+- solving:
+
+    ~$ fzn2z3.py examples/coloring.fzn
+    numColors = 4;
+    x = array1d(1..6, [1, 1, 2, 3, 4, 4]);
+    ----------
+
+
+
+
+## 
 
 
 # NOTES
