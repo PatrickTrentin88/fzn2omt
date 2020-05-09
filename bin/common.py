@@ -171,7 +171,6 @@ def get_smtlib_header_lines(config, solver):
     yield ";; fzn-optimathsat configuration:\n"
     yield ";;    --int-enc={}\n".format(config.int_enc)
     yield ";;    --bv-enc={}\n".format(config.bv_enc)
-    yield ";;    --bv_alldifferent={}\n".format(config.bv_alldifferent)
     yield ";;    --cardinality-networks={}\n".format(config.cardinality_networks)
     yield ";; target solver: {}\n".format(solver)
     yield ";;\n"

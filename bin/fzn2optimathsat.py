@@ -76,7 +76,6 @@ def optimathsat_solve_cmdline_args(config):
             "-input=fzn",
             config.model,
             "-opt.fzn.asoft_encoding={}".format(config.cardinality_networks),
-            "-opt.fzn.bv_all_different={}".format(config.bv_alldifferent),
             "-opt.fzn.bv_integers={}".format(not config.int_enc),
             "-opt.fzn.max_solutions={}".format(config.max_solutions),
             "-opt.fzn.all_solutions={}".format(config.all_solutions_opt),
@@ -145,7 +144,6 @@ def optimathsat_compile_cmdline_args(config):
             "-debug.api_call_trace_filename={}".format(config.smt2),
             "-debug.solver_enabled=False",
             "-opt.fzn.asoft_encoding={}".format(config.cardinality_networks),
-            "-opt.fzn.bv_all_different={}".format(config.bv_alldifferent),
             "-opt.fzn.bv_integers={}".format(not config.int_enc)]
 
     if config.ovars:
@@ -258,11 +256,6 @@ def optimathsat_parse_cmdline_options():
                            help="Enable cardinality networks (when applicable).",
                            action="store_true", default=False)
 
-
-    # opt.fzn.bv_all_different (true)
-    enc_group.add_argument("--bv-alldifferent",
-                           help="all-different constraints encoded with Bit-Vectors.",
-                           action="store_true", default=False)
 
     ##################
     # SEARCH config #

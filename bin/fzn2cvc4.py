@@ -321,10 +321,6 @@ def cvc4_parse_cmdline_options():
                            help="Enable cardinality networks (when applicable).",
                            action="store_true", default=False)
 
-    enc_group.add_argument("--bv-alldifferent",
-                           help="all-different constraints encoded with Bit-Vectors.",
-                           action="store_true", default=False)
-
     enc_group.add_argument("--ignore-objs",
                            help=("Ignore any objective contained in the input "
                                  "FlatZinc problem rather than terminate the "

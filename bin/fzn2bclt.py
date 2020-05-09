@@ -186,7 +186,6 @@ def barcelogic_compile(config):
     assert config.smt2
 
     optimathsat_config = argparse.Namespace(**vars(config))
-    optimathsat_config.bv_alldifferent = False
     optimathsat_config.int_enc = True
     optimathsat_config.bv_enc = False
     optimathsat_config.compile_raw = True
