@@ -329,7 +329,13 @@ def model_value_to_str(config, term):
     elif isinstance(term, int):
         ret = str(term)
     elif isinstance(term, Fraction):
-        ret = config.float_fmt % term
+        if config.infinite_precision:
+            if term.denominator != 1:
+                ret = "{}/{}".format(term.numerator, term.denominator)
+            else:
+                ret = str(term.numerator)
+        else:
+            ret = config.float_fmt % term
     elif isinstance(term, set):
         if term:
             ret = str(term) # can only contain int

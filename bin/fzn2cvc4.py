@@ -190,7 +190,7 @@ def cvc4_compile(config):
     assert config.smt2
 
     optimathsat_config = argparse.Namespace(**vars(config))
-    optimathsat_config.infinite_precision = True
+    optimathsat_config.infinite_precision = True    # always override!
     optimathsat_config.compile_raw = True
 
     if not hasattr(optimathsat_config, 'ovars'):
@@ -345,6 +345,10 @@ def cvc4_parse_cmdline_options():
 
     model_group = parser.add_argument_group("Model Options")
 
+    model_group.add_argument("--infinite-precision",
+                             help=("Print infinite-precision rational numbers "
+                                   "as fractions. Overrides --finite-precision."),
+                             action="store_true", default=False)
     model_group.add_argument("--finite-precision",
                              help=("Print infinite-precision rational numbers "
                                    "as finite precision decimals using the specified "
