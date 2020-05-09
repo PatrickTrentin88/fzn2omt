@@ -1,0 +1,2 @@
+var int: x ::output_var;
+solve minimize x;
