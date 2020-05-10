@@ -58,6 +58,10 @@ compiler for
   for multi-objective optimization. Thus, multiple optimization targets
   are solved incrementally.
 
+- SMT/OMT solvers use infinite-precision arithmetic. Upon user request,
+  models are printed with finite precision by default. It is possible to
+  print a model with infinite precision using the option `--infinite-precision`.
+  
 
 # REQUIREMENTS
 
