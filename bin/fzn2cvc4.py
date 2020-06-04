@@ -82,7 +82,7 @@ def cvc4_solve(config, solver_config=None):
 
         with open(output_trace, "w") as out_f:
             result = subprocess.run(args, text=True, stderr=subprocess.PIPE,
-                                    stdout=out_f)
+                                    stdout=out_f, check=True)
 
             # 4. display any error
             if result.returncode:

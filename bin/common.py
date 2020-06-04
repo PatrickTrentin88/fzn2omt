@@ -321,7 +321,7 @@ def print_model(config, model, oskeleton):
         svalue = model_value_to_str(config, mvalue)
         print(oinfo.str(svalue))
 
-def model_value_to_str(config, term):
+def model_value_to_str(config, term): # pylint: disable=R0912
     """Returns the string representation of a model value."""
     ret = None
     if isinstance(term, bool):
@@ -393,7 +393,7 @@ def model_value(model, term):
 # MODEL AUTO-COMPLETION #
 #########################
 
-def extract_model_autocomplete(config, model, oskeleton): # pylint: disable=R0914
+def extract_model_autocomplete(config, model, oskeleton): # pylint: disable=R0914,R1721
     """Returns a dictionary assigning a value to
     every variable required by the solution skeleton
     that is not assigned in the model."""
@@ -402,13 +402,12 @@ def extract_model_autocomplete(config, model, oskeleton): # pylint: disable=R091
     # 1. extract required SMT-LIB variables from skeleton
     var2decl = {}
     for entry in oskeleton:
-        variables = [el for el in extract_variables(entry.term)]
-        if variables:
-            for var in variables:
-                if var not in var2decl:
-                    var2decl[var] = set()
-                var2decl[var].add(entry.decl)
-        else:
+        n_vars = -1
+        for n_vars, var in enumerate(extract_variables(entry.term)):
+            if var not in var2decl:
+                var2decl[var] = set()
+            var2decl[var].add(entry.decl)
+        if n_vars < 0:
             autocomplete[entry.decl] = entry.term
 
     # 2. find variables without a model value

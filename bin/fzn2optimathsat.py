@@ -59,7 +59,7 @@ def optimathsat_solve(config, solver_config=None):
     if solver_config:
         args.extend(solver_config)
 
-    subprocess.run(args, text=True)
+    subprocess.run(args, text=True, check=True)
 
 
 def optimathsat_solve_cmdline_args(config):
@@ -107,7 +107,7 @@ def optimathsat_compile(config, solver_config=None):
     if solver_config:
         args.extend(solver_config)
 
-    result = subprocess.run(args, capture_output=True, text=True)
+    result = subprocess.run(args, capture_output=True, text=True, check=True)
 
     if result.returncode:
         print(result.stdout, end='')
