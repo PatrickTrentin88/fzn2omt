@@ -81,7 +81,7 @@ def check_finite_precision():
 
 def is_optimization_problem(fzn_file):
     """Checks whether the FlatZinc problem contains an optimization goal."""
-    with open(fzn_file, 'r') as fd_fzn:
+    with io.open(fzn_file, 'r', newline=None) as fd_fzn:
         with mmap.mmap(fd_fzn.fileno(), 0, access=mmap.ACCESS_READ) as fd_mmap:
             return re.search(b"solve .*satisfy;", fd_mmap) is None
 
@@ -92,13 +92,13 @@ def is_optimization_problem(fzn_file):
 
 def match_check_sat(bline):
     """Matches (check-sat) in the given argument."""
-    regex = re.compile(br"^\(check-sat\)$")
+    regex = re.compile(br"^\(check-sat\)\r?$")
     return re.match(regex, bline)
 
 def match_objective(bline):
     """Matches an optimization goal declaration
     in the given argument."""
-    regex = re.compile(br"^\((minimize|maximize) ([^:]*?) ?(:signed)?\)$")
+    regex = re.compile(br"^\((minimize|maximize) ([^:]*?) ?(:signed)?\)\r?$")
     match = re.match(regex, bline)
     if match:
         obj = argparse.Namespace()
@@ -145,7 +145,7 @@ def extract_bv_var_width(config, bv_var):
     assert not is_file_empty(config.smt2)
 
     width = -1
-    with io.open(config.smt2, 'rt') as in_f:
+    with io.open(config.smt2, 'rt', newline=None) as in_f:
         with mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ) as formula:
 
             regex_decl = re.compile((br"\((?:define|declare)-fun +%b +"
@@ -418,7 +418,7 @@ def extract_model_autocomplete(config, model, oskeleton): # pylint: disable=R091
 
         cache = {}
 
-        with io.open(config.model, 'rt') as in_f:
+        with io.open(config.model, 'rt', newline=None) as in_f:
             with mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ) as flatzinc:
 
                 for orphan in orphans:
@@ -477,7 +477,7 @@ def extract_solution_skeleton(ovars_file): # pylint: disable=R0914
     regex_arr = re.compile(r"array(.*)d\((.*) (\[.*\])\)")
     regex_raw = re.compile(r"\{.+?\}|[^, \[\]]+")
 
-    with io.open(ovars_file, 'rt') as in_f:
+    with io.open(ovars_file, 'rt', newline=None) as in_f:
         with mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ) as skeleton:
 
             # skip first line

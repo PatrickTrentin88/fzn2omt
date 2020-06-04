@@ -156,10 +156,10 @@ def make_smtlib_compatible_with_optimathsat(config, solver_config):
     """Modifies SMT-LIB file with OptiMathSAT-specific syntax."""
     tmp_file_name = None
 
-    with io.open(config.smt2, 'rt') as in_f:
+    with io.open(config.smt2, 'rt', newline=None) as in_f:
         with mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ) as formula:
 
-            with tempfile.NamedTemporaryFile(mode="w+t", delete=False) as out_f:
+            with tempfile.NamedTemporaryFile(mode="w+t", delete=False, newline='') as out_f:
                 tmp_file_name = out_f.name
 
                 # Consume first two lines

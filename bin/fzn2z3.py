@@ -75,13 +75,13 @@ def zthree_solve(config, solver_config=None):
         if solver_config:
             args.extend(solver_config)
 
-        with open(output_trace, "w") as out_f:
+        with io.open(output_trace, "w", newline=None) as out_f:
             result = subprocess.run(args, text=True, stderr=subprocess.PIPE,
                                     stdout=out_f, check=True)
 
             # 4. display any error
             if result.returncode:
-                with open(output_trace, "r") as in_f:
+                with io.open(output_trace, "r", newline=None) as in_f:
                     print(in_f.read(), file=sys.stderr, end='')
                 sys.exit(1)
 
@@ -115,10 +115,10 @@ def zthree_extract_search_status(tracefile):
 
     if not common.is_file_empty(tracefile):
 
-        uns_regex = re.compile(rb"^unsat$", re.MULTILINE)
-        sat_regex = re.compile(rb"^sat$", re.MULTILINE)
+        uns_regex = re.compile(rb"^unsat\r?$", re.MULTILINE)
+        sat_regex = re.compile(rb"^sat\r?$", re.MULTILINE)
 
-        with io.open(tracefile, 'r') as fd_trace:
+        with io.open(tracefile, 'r', newline=None) as fd_trace:
             with mmap.mmap(fd_trace.fileno(), 0, access=mmap.ACCESS_READ) as output:
 
                 uns_match = re.search(uns_regex, output)
@@ -140,12 +140,12 @@ def zthree_extract_models(tracefile):
     in the given tracefile."""
 
     regex = re.compile((rb"\(define-fun (.*) \(\) (Int|Bool|Real|\(_ BitVec [0-9]+\))"
-                        rb"\n +(.*)\)"))
+                        rb"\r?\n +(.*)\)"))
 
     models = []
 
     if not common.is_file_empty(tracefile):
-        with io.open(tracefile, 'r') as fd_trace:
+        with io.open(tracefile, 'r', newline=None) as fd_trace:
             with mmap.mmap(fd_trace.fileno(), 0, access=mmap.ACCESS_READ) as output:
                 model = {}
                 for match in re.finditer(regex, output):
@@ -194,10 +194,10 @@ def make_smtlib_compatible_with_zthree(config, optimathsat_config): # pylint: di
     """Modifies SMT-LIB file with Z3-specific syntax."""
     tmp_file_name = None
 
-    with io.open(config.smt2, 'rt') as in_f:
+    with io.open(config.smt2, 'rt', newline=None) as in_f:
         with mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ) as formula:
 
-            with tempfile.NamedTemporaryFile(mode="w+t", delete=False) as out_f:
+            with tempfile.NamedTemporaryFile(mode="w+t", delete=False, newline='') as out_f:
                 tmp_file_name = out_f.name
 
                 # Consume first two lines
