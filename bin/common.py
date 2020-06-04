@@ -82,8 +82,8 @@ def check_finite_precision():
 def is_optimization_problem(fzn_file):
     """Checks whether the FlatZinc problem contains an optimization goal."""
     with open(fzn_file, 'r') as fd_fzn:
-        fd_mmap = mmap.mmap(fd_fzn.fileno(), 0, access=mmap.ACCESS_READ)
-        return re.search(b"solve .*satisfy;", fd_mmap) is None
+        with mmap.mmap(fd_fzn.fileno(), 0, access=mmap.ACCESS_READ) as fd_mmap:
+            return re.search(b"solve .*satisfy;", fd_mmap) is None
 
 
 #############################
@@ -146,17 +146,17 @@ def extract_bv_var_width(config, bv_var):
 
     width = -1
     with io.open(config.smt2, 'rt') as in_f:
-        formula = mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ)
+        with mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ) as formula:
 
-        regex_decl = re.compile((br"\((?:define|declare)-fun +%b +"
-                                 br"\(\) \(_ BitVec ([0-9]+)\)") % bv_var)
+            regex_decl = re.compile((br"\((?:define|declare)-fun +%b +"
+                                     br"\(\) \(_ BitVec ([0-9]+)\)") % bv_var)
 
-        match = re.search(regex_decl, formula)
-        if match:
-            width = int(match.group(1))
-        else:
-            raise Exception(("error: failed to determine "
-                             "BitVec width of `{}`").format(bv_var.decode("utf-8")))
+            match = re.search(regex_decl, formula)
+            if match:
+                width = int(match.group(1))
+            else:
+                raise Exception(("error: failed to determine "
+                                 "BitVec width of `{}`").format(bv_var.decode("utf-8")))
 
     return width
 
@@ -420,29 +420,29 @@ def extract_model_autocomplete(config, model, oskeleton): # pylint: disable=R091
         cache = {}
 
         with io.open(config.model, 'rt') as in_f:
-            flatzinc = mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ)
+            with mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ) as flatzinc:
 
-            for orphan in orphans:
-                # search for a match in the cache first
-                for decl in var2decl[orphan]:
-                    if decl in cache:
-                        autocomplete[orphan] = cache[decl]
-                        break
-                else:
-                    # inspect flatzinc file
+                for orphan in orphans:
+                    # search for a match in the cache first
                     for decl in var2decl[orphan]:
-                        regex = re.compile((rb'(?:array +\[.*\] of +)?(?:var)? *'
-                                            rb'(set +of)? *(bool|int|float|.*)?'
-                                            rb' *: *%b *(?:::|=|;)')
-                                           % decl.encode("utf-8"))
-
-                        match = re.search(regex, flatzinc)
-                        if match:
-                            value = False if match.group(1) is not None \
-                                          else autocomplete_value(match.group(2))
-                            autocomplete[orphan] = value
-                            cache[decl] = value
+                        if decl in cache:
+                            autocomplete[orphan] = cache[decl]
                             break
+                    else:
+                        # inspect flatzinc file
+                        for decl in var2decl[orphan]:
+                            regex = re.compile((rb'(?:array +\[.*\] of +)?(?:var)? *'
+                                                rb'(set +of)? *(bool|int|float|.*)?'
+                                                rb' *: *%b *(?:::|=|;)')
+                                               % decl.encode("utf-8"))
+
+                            match = re.search(regex, flatzinc)
+                            if match:
+                                value = False if match.group(1) is not None \
+                                              else autocomplete_value(match.group(2))
+                                autocomplete[orphan] = value
+                                cache[decl] = value
+                                break
 
     return autocomplete
 
@@ -479,36 +479,36 @@ def extract_solution_skeleton(ovars_file): # pylint: disable=R0914
     regex_raw = re.compile(r"\{.+?\}|[^, \[\]]+")
 
     with io.open(ovars_file, 'rt') as in_f:
-        skeleton = mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ)
+        with mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ) as skeleton:
 
-        # skip first line
-        skeleton.readline()
+            # skip first line
+            skeleton.readline()
 
-        for line in iter(skeleton.readline, b""):
-            line = line.decode("utf-8")
+            for line in iter(skeleton.readline, b""):
+                line = line.decode("utf-8")
 
-            out = argparse.Namespace()
+                out = argparse.Namespace()
 
-            # extract 'var = expr'
-            out.decl, expr = re.match(regex_bsc, line).groups()
+                # extract 'var = expr'
+                out.decl, expr = re.match(regex_bsc, line).groups()
 
-            # extract array(..., [])
-            match = re.match(regex_arr, expr)
-            if match:
-                dim, decl, raw_arr = match.groups()
-                out.str = partial("{0} = array{1}d({2} {3});".format,
-                                  out.decl, dim, decl)
-                out.term = []
+                # extract array(..., [])
+                match = re.match(regex_arr, expr)
+                if match:
+                    dim, decl, raw_arr = match.groups()
+                    out.str = partial("{0} = array{1}d({2} {3});".format,
+                                      out.decl, dim, decl)
+                    out.term = []
 
-                terms = re.findall(regex_raw, raw_arr)
-                for term in terms:
-                    out.term.append(skeleton_term_to_python(term))
+                    terms = re.findall(regex_raw, raw_arr)
+                    for term in terms:
+                        out.term.append(skeleton_term_to_python(term))
 
-            else:
-                out.str = partial("{0} = {1};".format, out.decl)
-                out.term = skeleton_term_to_python(expr)
+                else:
+                    out.str = partial("{0} = {1};".format, out.decl)
+                    out.term = skeleton_term_to_python(expr)
 
-            ret.append(out)
+                ret.append(out)
 
     return ret
 

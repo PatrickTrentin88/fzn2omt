@@ -126,24 +126,24 @@ def barcelogic_extract_search_status(tracefile):
         opt_regex = re.compile(rb"^\(optimal .*\)$", re.MULTILINE)
 
         with io.open(tracefile, 'r') as fd_trace:
-            output = mmap.mmap(fd_trace.fileno(), 0, access=mmap.ACCESS_READ)
+            with mmap.mmap(fd_trace.fileno(), 0, access=mmap.ACCESS_READ) as output:
 
-            uns_match = re.search(uns_regex, output)
-            sat_match = re.search(sat_regex, output)
-            opt_match = re.search(opt_regex, output)
+                uns_match = re.search(uns_regex, output)
+                sat_match = re.search(sat_regex, output)
+                opt_match = re.search(opt_regex, output)
 
-            # NOTE: in Barcelogic, this may be violated if the optimization
-            # search interval is unsatisfiable for one optimization goal but
-            # satisfiable for another (requires multi-objective optimization).
-            # Currently, we do not handle this corner case. Report any violation.
-            assert sum([bool(x) for x in (uns_match, sat_match, opt_match)]) <= 1
+                # NOTE: in Barcelogic, this may be violated if the optimization
+                # search interval is unsatisfiable for one optimization goal but
+                # satisfiable for another (requires multi-objective optimization).
+                # Currently, we do not handle this corner case. Report any violation.
+                assert sum([bool(x) for x in (uns_match, sat_match, opt_match)]) <= 1
 
-            if any((sat_match, opt_match)):
-                ret = common.SAT
-            elif uns_match:
-                ret = common.UNSAT
-            else:
-                ret = common.UNKNOWN
+                if any((sat_match, opt_match)):
+                    ret = common.SAT
+                elif uns_match:
+                    ret = common.UNSAT
+                else:
+                    ret = common.UNKNOWN
 
     return ret
 
@@ -157,19 +157,19 @@ def barcelogic_extract_models(tracefile):
 
     if not common.is_file_empty(tracefile):
         with io.open(tracefile, 'r') as fd_trace:
-            output = mmap.mmap(fd_trace.fileno(), 0, access=mmap.ACCESS_READ)
-            model = {}
-            for match in re.finditer(regex, output):
-                var, stype, value = (x.decode("utf-8") for x in match.groups())
+            with mmap.mmap(fd_trace.fileno(), 0, access=mmap.ACCESS_READ) as output:
+                model = {}
+                for match in re.finditer(regex, output):
+                    var, stype, value = (x.decode("utf-8") for x in match.groups())
 
-                if var in model:
+                    if var in model:
+                        models.append(model)
+                        model = {}
+
+                    model[var] = common.smtlib_to_python_type(stype, value)
+
+                if model:
                     models.append(model)
-                    model = {}
-
-                model[var] = common.smtlib_to_python_type(stype, value)
-
-            if model:
-                models.append(model)
     return models
 
 
@@ -204,53 +204,53 @@ def make_smtlib_compatible_with_barcelogic(config, optimathsat_config):
     tmp_file_name = None
 
     with io.open(config.smt2, 'rt') as in_f:
-        formula = mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ)
+        with mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ) as formula:
 
-        with tempfile.NamedTemporaryFile(mode="w+t", delete=False) as out_f:
-            tmp_file_name = out_f.name
+            with tempfile.NamedTemporaryFile(mode="w+t", delete=False) as out_f:
+                tmp_file_name = out_f.name
 
-            # Consume first two lines
-            out_f.write(formula.readline().decode("utf-8"))
-            out_f.write(formula.readline().decode("utf-8"))
+                # Consume first two lines
+                out_f.write(formula.readline().decode("utf-8"))
+                out_f.write(formula.readline().decode("utf-8"))
 
-            # Print header
-            for header_line in common.get_smtlib_header_lines(optimathsat_config,
-                                                              "bclt"):
-                out_f.write(header_line)
+                # Print header
+                for header_line in common.get_smtlib_header_lines(optimathsat_config,
+                                                                  "bclt"):
+                    out_f.write(header_line)
 
-            # Consume third line
-            out_f.write(formula.readline().decode("utf-8"))
+                # Consume third line
+                out_f.write(formula.readline().decode("utf-8"))
 
-            # Print logic
-            out_f.write("(set-logic ALL)\n")
+                # Print logic
+                out_f.write("(set-logic ALL)\n")
 
-            # Print config
-            if config.random_seed:
-                out_f.write("(set-option :random-seed {})\n".format(config.random_seed))
+                # Print config
+                if config.random_seed:
+                    out_f.write("(set-option :random-seed {})\n".format(config.random_seed))
 
-            # copy formula, except for minimize/maximize/check-sat
-            objectives = []
-            for line in iter(formula.readline, b""):
-                obj = common.match_objective(line)
-                if obj:
-                    objectives.append(obj)
-                elif common.match_check_sat(line):
-                    continue
+                # copy formula, except for minimize/maximize/check-sat
+                objectives = []
+                for line in iter(formula.readline, b""):
+                    obj = common.match_objective(line)
+                    if obj:
+                        objectives.append(obj)
+                    elif common.match_check_sat(line):
+                        continue
+                    else:
+                        line = barcelogic_suppress_to_int(line)
+                        out_f.write(line.decode("utf-8"))
+
+                # footer
+                if objectives:
+                    for obj in objectives:
+                        for line in barcelogic_objective_to_str(config, obj):
+                            out_f.write(line)
+                        out_f.write("(get-model)\n")
+                    out_f.write("(exit)\n")
                 else:
-                    line = barcelogic_suppress_to_int(line)
-                    out_f.write(line.decode("utf-8"))
-
-            # footer
-            if objectives:
-                for obj in objectives:
-                    for line in barcelogic_objective_to_str(config, obj):
-                        out_f.write(line)
+                    out_f.write("(check-sat)\n")
                     out_f.write("(get-model)\n")
-                out_f.write("(exit)\n")
-            else:
-                out_f.write("(check-sat)\n")
-                out_f.write("(get-model)\n")
-                out_f.write("(exit)\n")
+                    out_f.write("(exit)\n")
 
     # overwrite raw SMT-LIB file with OptiMathSAT-specific file
     if tmp_file_name:

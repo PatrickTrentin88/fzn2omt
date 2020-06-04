@@ -119,19 +119,19 @@ def zthree_extract_search_status(tracefile):
         sat_regex = re.compile(rb"^sat$", re.MULTILINE)
 
         with io.open(tracefile, 'r') as fd_trace:
-            output = mmap.mmap(fd_trace.fileno(), 0, access=mmap.ACCESS_READ)
+            with mmap.mmap(fd_trace.fileno(), 0, access=mmap.ACCESS_READ) as output:
 
-            uns_match = re.search(uns_regex, output)
-            sat_match = re.search(sat_regex, output)
+                uns_match = re.search(uns_regex, output)
+                sat_match = re.search(sat_regex, output)
 
-            assert sum([bool(x) for x in (uns_match, sat_match)]) <= 1
+                assert sum([bool(x) for x in (uns_match, sat_match)]) <= 1
 
-            if sat_match:
-                ret = common.SAT
-            elif uns_match:
-                ret = common.UNSAT
-            else:
-                ret = common.UNKNOWN
+                if sat_match:
+                    ret = common.SAT
+                elif uns_match:
+                    ret = common.UNSAT
+                else:
+                    ret = common.UNKNOWN
 
     return ret
 
@@ -146,22 +146,22 @@ def zthree_extract_models(tracefile):
 
     if not common.is_file_empty(tracefile):
         with io.open(tracefile, 'r') as fd_trace:
-            output = mmap.mmap(fd_trace.fileno(), 0, access=mmap.ACCESS_READ)
-            model = {}
-            for match in re.finditer(regex, output):
-                var, stype, value = (x.decode("utf-8") for x in match.groups())
+            with mmap.mmap(fd_trace.fileno(), 0, access=mmap.ACCESS_READ) as output:
+                model = {}
+                for match in re.finditer(regex, output):
+                    var, stype, value = (x.decode("utf-8") for x in match.groups())
 
-                if "BitVec" in stype:
-                    stype = "BitVec"
+                    if "BitVec" in stype:
+                        stype = "BitVec"
 
-                if var in model:
+                    if var in model:
+                        models.append(model)
+                        model = {}
+
+                    model[var] = common.smtlib_to_python_type(stype, value)
+
+                if model:
                     models.append(model)
-                    model = {}
-
-                model[var] = common.smtlib_to_python_type(stype, value)
-
-            if model:
-                models.append(model)
 
     return models
 
@@ -195,69 +195,69 @@ def make_smtlib_compatible_with_zthree(config, optimathsat_config): # pylint: di
     tmp_file_name = None
 
     with io.open(config.smt2, 'rt') as in_f:
-        formula = mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ)
+        with mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ) as formula:
 
-        with tempfile.NamedTemporaryFile(mode="w+t", delete=False) as out_f:
-            tmp_file_name = out_f.name
+            with tempfile.NamedTemporaryFile(mode="w+t", delete=False) as out_f:
+                tmp_file_name = out_f.name
 
-            # Consume first two lines
-            out_f.write(formula.readline().decode("utf-8"))
-            out_f.write(formula.readline().decode("utf-8"))
+                # Consume first two lines
+                out_f.write(formula.readline().decode("utf-8"))
+                out_f.write(formula.readline().decode("utf-8"))
 
-            # Print header
-            for header_line in common.get_smtlib_header_lines(optimathsat_config,
-                                                              "z3"):
-                out_f.write(header_line)
+                # Print header
+                for header_line in common.get_smtlib_header_lines(optimathsat_config,
+                                                                  "z3"):
+                    out_f.write(header_line)
 
-            # Consume third line
-            out_f.write(formula.readline().decode("utf-8"))
+                # Consume third line
+                out_f.write(formula.readline().decode("utf-8"))
 
-            # Print logic
-            out_f.write("(set-logic ALL)\n")
+                # Print logic
+                out_f.write("(set-logic ALL)\n")
 
-            # Print config
-            out_f.write("(set-option :produce-models true)\n")
-            if config.random_seed:
-                out_f.write("(set-option :random-seed {})\n".format(config.random_seed))
-            if config.bv_enc:
-                out_f.write("(set-option :pp.bv-literals false)\n")
+                # Print config
+                out_f.write("(set-option :produce-models true)\n")
+                if config.random_seed:
+                    out_f.write("(set-option :random-seed {})\n".format(config.random_seed))
+                if config.bv_enc:
+                    out_f.write("(set-option :pp.bv-literals false)\n")
 
-            # copy formula, except for minimize/maximize/check-sat
-            objectives = []
-            for line in iter(formula.readline, b""):
-                obj = common.match_objective(line)
+                # copy formula, except for minimize/maximize/check-sat
+                objectives = []
+                for line in iter(formula.readline, b""):
+                    obj = common.match_objective(line)
 
-                if obj:
-                    if config.bv_enc:
-                        regex = re.compile(rb" %b \(\) \(_ BitVec ([0-9]+)\)"
-                                           % obj.term.encode("utf-8"))
-                        match = re.search(regex, formula)
-                        if match:
-                            obj.bv_width = int(match.group(1))
+                    if obj:
+                        if config.bv_enc:
+                            regex = re.compile(rb" %b \(\) \(_ BitVec ([0-9]+)\)"
+                                               % obj.term.encode("utf-8"))
+                            match = re.search(regex, formula)
+                            if match:
+                                obj.bv_width = int(match.group(1))
 
-                    objectives.append(obj)
+                        objectives.append(obj)
 
-                elif common.match_check_sat(line):
-                    continue
-                else:
-                    if config.bv_enc:
-                        line = line.replace(b'_ to_bv ', b'_ int2bv ')
-                        line = common.replace_sbv_to_int(config, line)
-                    out_f.write(line.decode("utf-8"))
+                    elif common.match_check_sat(line):
+                        continue
+                    else:
+                        if config.bv_enc:
+                            line = line.replace(b'_ to_bv ', b'_ int2bv ')
+                            line = common.replace_sbv_to_int(config, line)
+                        out_f.write(line.decode("utf-8"))
 
-            # footer
-            for obj in objectives:
-                for line in zthree_objective_to_str(config, obj):
-                    out_f.write(line)
-            out_f.write("(check-sat)\n")
+                # footer
+                for obj in objectives:
+                    for line in zthree_objective_to_str(config, obj):
+                        out_f.write(line)
+                out_f.write("(check-sat)\n")
 
-            if objectives:
-                out_f.write("(get-objectives)\n")
+                if objectives:
+                    out_f.write("(get-objectives)\n")
 
-            if config.get_model:
-                out_f.write("(get-model)\n")
+                if config.get_model:
+                    out_f.write("(get-model)\n")
 
-            out_f.write("(exit)\n")
+                out_f.write("(exit)\n")
 
     # overwrite raw SMT-LIB file with OptiMathSAT-specific file
     if tmp_file_name:

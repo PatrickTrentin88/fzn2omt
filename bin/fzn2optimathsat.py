@@ -157,41 +157,41 @@ def make_smtlib_compatible_with_optimathsat(config, solver_config):
     tmp_file_name = None
 
     with io.open(config.smt2, 'rt') as in_f:
-        formula = mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ)
+        with mmap.mmap(in_f.fileno(), 0, access=mmap.ACCESS_READ) as formula:
 
-        with tempfile.NamedTemporaryFile(mode="w+t", delete=False) as out_f:
-            tmp_file_name = out_f.name
+            with tempfile.NamedTemporaryFile(mode="w+t", delete=False) as out_f:
+                tmp_file_name = out_f.name
 
-            # Consume first two lines
-            out_f.write(formula.readline().decode("utf-8"))
-            out_f.write(formula.readline().decode("utf-8"))
+                # Consume first two lines
+                out_f.write(formula.readline().decode("utf-8"))
+                out_f.write(formula.readline().decode("utf-8"))
 
-            # Print header
-            for header_line in common.get_smtlib_header_lines(config, "optimathsat"):
-                out_f.write(header_line)
+                # Print header
+                for header_line in common.get_smtlib_header_lines(config, "optimathsat"):
+                    out_f.write(header_line)
 
-            # Print configuration
-            is_opt_problem = common.is_optimization_problem(config.model)
-            if is_opt_problem:
-                priority_cfg = list(filter(lambda h: len(h) == 3,
-                                           map(lambda g: g[14:],
-                                               filter(lambda f: "-opt.priority="
-                                                      in f, solver_config))))
-                if priority_cfg:
-                    priority = priority_cfg[-1]
-                    out_f.write("(set-option :opt-priority {})\n".format(priority))
-                    out_f.write("(set-option :config opt.par.mode=callback)\n")
+                # Print configuration
+                is_opt_problem = common.is_optimization_problem(config.model)
+                if is_opt_problem:
+                    priority_cfg = list(filter(lambda h: len(h) == 3,
+                                               map(lambda g: g[14:],
+                                                   filter(lambda f: "-opt.priority="
+                                                          in f, solver_config))))
+                    if priority_cfg:
+                        priority = priority_cfg[-1]
+                        out_f.write("(set-option :opt-priority {})\n".format(priority))
+                        out_f.write("(set-option :config opt.par.mode=callback)\n")
 
-            # copy formula
-            for line in iter(formula.readline, b""):
-                out_f.write(line.decode("utf-8"))
+                # copy formula
+                for line in iter(formula.readline, b""):
+                    out_f.write(line.decode("utf-8"))
 
-            # footer
-            if is_opt_problem:
-                out_f.write("(get-objectives)\n")
-                out_f.write("(load-objective-model -1)\n")
-            out_f.write("(get-model)\n")
-            out_f.write("(exit)\n")
+                # footer
+                if is_opt_problem:
+                    out_f.write("(get-objectives)\n")
+                    out_f.write("(load-objective-model -1)\n")
+                out_f.write("(get-model)\n")
+                out_f.write("(exit)\n")
 
     # overwrite raw SMT-LIB file with OptiMathSAT-specific file
     if tmp_file_name:
