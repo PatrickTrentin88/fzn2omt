@@ -32,7 +32,7 @@ export BASE_DIR=$(pwd)
 export PATH_BIN="${BASE_DIR}/bin"
 export PATH_BCLT="${BASE_DIR}/tools/bclt"
 export PATH_CVC4="${BASE_DIR}/tools/CVC4-1.7"
-export PATH_OPTIMATHSAT="${BASE_DIR}/tools/optimathsat-1.7.1-linux-64-bit/bin"
+export PATH_OPTIMATHSAT="${BASE_DIR}/tools/optimathsat-1.7.2-linux-64-bit/bin"
 export PATH_Z3="${BASE_DIR}/tools/z3/build"
 
 ##############################################################

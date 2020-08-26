@@ -81,7 +81,7 @@ def barcelogic_solve(config, solver_config=None):
 
         with io.open(output_trace, "w", newline=None) as out_f:
             # NOTE: barcelogic returns non-zero status without errors
-            result = subprocess.run(args, text=True, stderr=subprocess.PIPE,
+            result = subprocess.run(args, universal_newlines=True, stderr=subprocess.PIPE,
                                     stdout=out_f, check=False)
 
             # 4. display any error

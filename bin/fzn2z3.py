@@ -76,7 +76,7 @@ def zthree_solve(config, solver_config=None):
             args.extend(solver_config)
 
         with io.open(output_trace, "w", newline=None) as out_f:
-            result = subprocess.run(args, text=True, stderr=subprocess.PIPE,
+            result = subprocess.run(args, universal_newlines=True, stderr=subprocess.PIPE,
                                     stdout=out_f, check=True)
 
             # 4. display any error
