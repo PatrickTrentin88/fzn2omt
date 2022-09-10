@@ -103,6 +103,7 @@ def zthree_solve_cmdline_args(config):
     args = [binary_filename(),
             config.smt2,
             "model.completion=true",
+            "model.user_functions=false",
             "dump_models=true"]
 
     return args
