@@ -1,5 +1,5 @@
 {
-  "id": "optimathsat_bv",
+  "id": "it.unitn.disi.optimathsat.bv",
   "name": "OptiMathSAT (BV)",
   "description": "OptiMathSAT + OMT(BV)",
   "version": "1.7.3",
