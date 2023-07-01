@@ -1,0 +1,17 @@
+{
+  "id": "optimathsat_bv",
+  "name": "OptiMathSAT (BV)",
+  "description": "OptiMathSAT + OMT(BV)",
+  "version": "1.7.3",
+  "mznlib": "",
+  "executable": "/opt/tools/fzn2omt/minizinc_integration/optimathsat_bv.sh",
+  "tags": ["SMT","bv"],
+  "stdFlags": ["-a","-n","-p","-r","-f"],
+  "supportsMzn": false,
+  "extraFlags": [],
+  "supportsFzn": true,
+  "needsSolns2Out": true,
+  "needsMznExecutable": false,
+  "needsStdlibDir": false,
+  "isGUIApplication": false
+ }

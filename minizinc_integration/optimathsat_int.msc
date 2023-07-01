@@ -1,0 +1,17 @@
+{
+  "id": "optimathsat_int",
+  "name": "OptiMathSAT (NIRA)",
+  "description": "OptiMathSAT + OMT(NIRA)",
+  "version": "1.7.3",
+  "mznlib": "",
+  "executable": "/opt/tools/fzn2omt/minizinc_integration/optimathsat_int.sh",
+  "tags": ["SMT","int"],
+  "stdFlags": ["-a","-n","-p","-r","-f"],
+  "supportsMzn": false,
+  "extraFlags": [],
+  "supportsFzn": true,
+  "needsSolns2Out": true,
+  "needsMznExecutable": false,
+  "needsStdlibDir": false,
+  "isGUIApplication": false
+ }
