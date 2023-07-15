@@ -41,30 +41,6 @@ export PATH_Z3="${BASE_DIR}/tools/z3/build"
 ##
 ##############################################################
 
-function pathappend()
-{
-  for ARG in "$@"
-  do
-    if [ -d "$ARG" ] && [[ ":$PATH:" != *":$ARG:"* ]]; then
-        PATH="${PATH:+"$PATH:"}$ARG"
-    fi
-  done
-  # credits: Guillaume Perrault-Archambault@superuser.com
-}
-
-function pathprepend()
-{
-  for ((i=$#; i>0; i--));
-  do
-    ARG=${!i}
-    if [ -d "$ARG" ] && [[ ":$PATH:" != *":$ARG:"* ]]; then
-        PATH="$ARG${PATH:+":$PATH"}"
-    fi
-  done
-  # credits: Guillaume Perrault-Archambault@superuser.com,
-  #          ishmael@superuser.com
-}
-
 function def_colors ()
 {
     export GREEN="\\033[1;32m"
@@ -79,8 +55,8 @@ function def_colors ()
 }
 def_colors
 
-pathprepend "${PATH_BIN}"
-pathprepend "${PATH_BCLT}"
-pathprepend "${PATH_CVC4}"
-pathprepend "${PATH_OPTIMATHSAT}"
-pathprepend "${PATH_Z3}"
+PATH="${PATH}":"${PATH_BIN}"
+PATH="${PATH}":"${PATH_BCLT}"
+PATH="${PATH}":"${PATH_CVC4}"
+PATH="${PATH}":"${PATH_OPTIMATHSAT}"
+PATH="${PATH}":"${PATH_Z3}"
