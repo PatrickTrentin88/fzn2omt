@@ -14,14 +14,14 @@ RUN git clone https://github.com/PatrickTrentin88/fzn2omt.git
 
 # Get OptiMathSAT
 WORKDIR /opt/tools/fzn2omt/tools
-RUN wget https://optimathsat.disi.unitn.it/releases/optimathsat-1.7.3/optimathsat-1.7.3-linux-64-bit.tar.gz
-RUN tar -xf optimathsat-1.7.3-linux-64-bit.tar.gz
-RUN rm optimathsat-1.7.3-linux-64-bit.tar.gz
+RUN wget https://optimathsat.disi.unitn.it/releases/optimathsat-1.7.4/optimathsat-1.7.4-linux-64-bit.tar.gz
+RUN tar -xf optimathsat-1.7.4-linux-64-bit.tar.gz
+RUN rm optimathsat-1.7.4-linux-64-bit.tar.gz
 WORKDIR /minizinc
 
 # Update PATH
-ENV PATH="$PATH:/opt/tools/fzn2omt/bin:/opt/tools/fzn2omt/tools/optimathsat-1.7.3-linux-64-bit/bin"
-RUN echo "export PATH=$PATH:/opt/tools/fzn2omt/bin:/opt/tools/fzn2omt/tools/optimathsat-1.7.3-linux-64-bit/bin >> ~/.bashrc"
+ENV PATH="$PATH:/opt/tools/fzn2omt/bin:/opt/tools/fzn2omt/tools/optimathsat-1.7.4-linux-64-bit/bin"
+RUN echo "export PATH=$PATH:/opt/tools/fzn2omt/bin:/opt/tools/fzn2omt/tools/optimathsat-1.7.4-linux-64-bit/bin >> ~/.bashrc"
 
 RUN echo '{"mzn_solver_path": ["/opt/tools/fzn2omt/minizinc_integration"],' > $HOME/.minizinc/Preferences.json && \
     echo '"tagDefaults": [["", "it.unitn.disi.optimathsat.bv"]]}'           >> $HOME/.minizinc/Preferences.json
