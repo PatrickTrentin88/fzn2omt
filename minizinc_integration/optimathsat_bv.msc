@@ -2,7 +2,7 @@
   "id": "it.unitn.disi.optimathsat.bv",
   "name": "OptiMathSAT (BV)",
   "description": "OptiMathSAT + OMT(BV)",
-  "version": "1.7.3",
+  "version": "1.7.4",
   "mznlib": "",
   "executable": "/opt/tools/fzn2omt/minizinc_integration/optimathsat_bv.sh",
   "tags": ["SMT","bv"],
