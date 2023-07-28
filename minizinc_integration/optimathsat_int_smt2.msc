@@ -3,7 +3,7 @@
   "name": "OptiMathSAT (NIRA+SMT2)",
   "description": "OptiMathSAT + OMT(NIRA) + SMT2",
   "version": "1.7.4",
-  "mznlib": "/opt/tools/fzn2omt/minizinc_integration/smt2",
+  "mznlib": "/opt/tools/fzn2omt/minizinc_integration/smt2-minimal",
   "executable": "/opt/tools/fzn2omt/minizinc_integration/optimathsat_int.sh",
   "tags": ["SMT","int"],
   "stdFlags": ["-a","-n","-p","-r","-f"],
