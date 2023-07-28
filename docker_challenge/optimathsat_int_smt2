@@ -11,6 +11,8 @@ RUN apt-get -y install python3
 WORKDIR /opt/tools
 
 RUN git clone https://github.com/PatrickTrentin88/fzn2omt.git
+WORKDIR /opt/tools/fzn2omt
+RUN git checkout c3732ca9a03f9c836202c52b86aa8b1a0d8dc279
 
 # Get OptiMathSAT
 WORKDIR /opt/tools/fzn2omt/tools
